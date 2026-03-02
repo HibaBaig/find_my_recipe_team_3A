@@ -5,4 +5,5 @@ app_name = "recipes"
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path("recipes/<int:recipe_id>/toggle-save/", views.toggle_save, name="toggle_save"),
 ]

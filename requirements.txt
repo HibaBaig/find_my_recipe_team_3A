@@ -1,6 +1,5 @@
 asgiref==3.11.1
 Django==5.2.11
 numpy==2.3.5
-packaging @ file:///C:/miniconda3/conda-bld/packaging_1761049096285/work
 sqlparse==0.5.5
 tzdata==2025.3

@@ -12,24 +12,54 @@ body {
 }
 
 .recipecard {
-
 	position: absolute;
 	width: 200px;
 	height: 250px;
 	background-color: #CAEDF1;
   border-radius: 5px;
-  
+}
+
+.recipetitle{
+  position: relative;
+  top: 20px;
+  left: 20px;
+
+  width: 160px;
+  height: 30px;
+  font-size: 14px;
+  font-family: "Avenir Next LT Pro", arial;
+  text-align: center;
+  /* white-space: nowrap; (maybe add at some point?) */
+}
+
+.recipeimage {
+  position: relative;
+  top: 60px;
+  left: 20px;
+
+  width: 160px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.recipecardsedcription {
+  position: relative;
+  top: 180px;
+  left: 20px;
+
+  width: 160px;
+  height: 60px;
+  font-size: 12px;
+  font-family: "Avenir Next LT Pro", arial;
+  text-align: center;
 }
 
 .header {
 	background-color: #FBE7C8;
-
-
 }
 
 .footer {
 	background-color: #FBE7C8;
-
 }
 </style>
 <head>
@@ -57,9 +87,9 @@ body {
   {% block extra_js %}{% endblock %}
 
   <div class = "recipecard">
-    /* <img src="{% recipeimage %}" alt = "???"> */
-    {{ recipetitle }}
-    {{ recipedescription }}
+    <div class = "recipetitle"> {{ recipetitle }}</div>
+    <div class = "recipedescription"> {{ recipedescription }}</div>
+    <img src="{{ recipe.image.url }}" class="recipeimage" alt="{{ recipe.title }}">
   </div>
 
 

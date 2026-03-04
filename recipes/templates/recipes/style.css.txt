@@ -1,1 +1,18 @@
-style.css
+<!doctype html>
+
+<head>
+
+</head>
+
+
+body {
+	background-colour: #FBE7C8
+	border-left-color: #AED581
+	border-left-width: 25px
+	border-left-style: dashed
+}
+
+
+
+
+.recipecard {}

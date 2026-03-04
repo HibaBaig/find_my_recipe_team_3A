@@ -1,6 +1,37 @@
 {% load static %}
 <!doctype html>
 <html lang="en">
+<style>
+head {}
+
+body {
+	background-color: #FBE7C8;
+	border-left-color: #AED581;
+	border-left-width: 25px;
+	border-left-style: dashed;
+}
+
+.recipecard {
+
+	position: absolute;
+	width: 200px;
+	height: 250px;
+	background-color: #CAEDF1;
+  border-radius: 5px;
+  
+}
+
+.header {
+	background-color: #FBE7C8;
+
+
+}
+
+.footer {
+	background-color: #FBE7C8;
+
+}
+</style>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -24,5 +55,13 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   {% block extra_js %}{% endblock %}
+
+  <div class = "recipecard">
+    /* <img src="{% recipeimage %}" alt = "???"> */
+    {{ recipetitle }}
+    {{ recipedescription }}
+  </div>
+
+
 </body>
 </html>

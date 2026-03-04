@@ -1,136 +1,32 @@
-{% extends "base.html" %}
-{% block title %}Home | Find My Recipe{% endblock %}
+{% load static %}
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Recipes</title>
+</head>
+<body>
+  <h1>Recipes</h1>
 
-{% block topbar %}
-<div class="container my-3">
-  <div class="wireframe-shell">
-    <!-- Top row: Logo | Search | Surprise Me | Login/Profile -->
-    <div class="row g-3 align-items-center">
-      <div class="col-12 col-md-2">
-        <a href="{% url 'home' %}" class="wf-box wf-box-center text-decoration-none">
-          <span class="text-dark fw-semibold">Logo</span>
-        </a>
-      </div>
+  {% if user.is_authenticated %}
+    <p>Logged in as {{ user.username }}</p>
+  {% else %}
+    <p>Login to test Save (AJAX needs login).</p>
+  {% endif %}
 
-      <div class="col-12 col-md-6">
-        <form method="get" action="{% url 'home' %}" class="wf-box p-2">
-          <input
-            class="form-control wf-search"
-            type="search"
-            name="q"
-            placeholder="Search recipes / ingredients..."
-            value="{{ request.GET.q|default:'' }}"
-          >
-        </form>
-      </div>
+  {% for r in recipes %}
+    <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
+      <h3>{{ r.title }}</h3>
 
-      <div class="col-6 col-md-2">
-        <a href="{% url 'surprise_me' %}" class="wf-box wf-box-center text-decoration-none">
-          <span class="text-dark fw-semibold">Surprise Me</span>
-        </a>
-      </div>
-
-      <div class="col-6 col-md-2">
-        {% if user.is_authenticated %}
-          <a href="{% url 'profile' %}" class="wf-box wf-box-center text-decoration-none">
-            <span class="text-dark fw-semibold">Profile</span>
-          </a>
-        {% else %}
-          <a href="{% url 'login' %}" class="wf-box wf-box-center text-decoration-none">
-            <span class="text-dark fw-semibold">Login</span>
-          </a>
-        {% endif %}
-      </div>
+      {% if user.is_authenticated %}
+        <button class="save-btn" data-recipe-id="{{ r.id }}">Save</button>
+        Saves: <span id="save-count-{{ r.id }}">{{ r.saves.count }}</span>
+      {% endif %}
     </div>
+  {% empty %}
+    <p>No recipes yet. Add one via /admin/</p>
+  {% endfor %}
 
-    <!-- Body row: Filters | Featured/Trending grid -->
-    <div class="row g-3 mt-1">
-      <!-- Filters panel -->
-      <aside class="col-12 col-lg-3">
-        <div class="wf-panel h-100">
-          <div class="wf-panel-title">Filters</div>
-
-          <div class="wf-panel-body">
-            <ul class="wf-bullets">
-              <li>Dietary: Vegan / GF / Halal</li>
-              <li>Time: &lt;15 / &lt;30</li>
-              <li>Tags: Quick / High-protein</li>
-              <li>Rating: 4+</li>
-              <li>Sort: New / Top</li>
-            </ul>
-
-            <!-- Optional: real filter form -->
-            {# 
-            <form method="get" action="{% url 'home' %}">
-              ...
-            </form>
-            #}
-          </div>
-        </div>
-      </aside>
-
-      <!-- Featured/Trending + cards -->
-      <section class="col-12 col-lg-9">
-        <div class="wf-section-title">Featured / Trending</div>
-
-        <div class="row g-3">
-          {% for recipe in recipes %}
-            <div class="col-12 col-md-4">
-              <a class="text-decoration-none" href="{% url 'recipe_detail' recipe.id %}">
-                <div class="wf-card">
-                  <div class="wf-card-img">
-                    {% if recipe.image %}
-                      <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
-                    {% else %}
-                      <div class="wf-img-placeholder">Image</div>
-                    {% endif %}
-                  </div>
-
-                  <div class="wf-card-body">
-                    <div class="wf-title text-dark">{{ recipe.title|default:"Title" }}</div>
-
-                    <div class="wf-meta">
-                      <span class="wf-star"><i class="bi bi-star-fill"></i></span>
-                      <span class="me-2">rating</span>
-                      <span class="wf-clock"><i class="bi bi-clock"></i></span>
-                      <span>time</span>
-                    </div>
-
-                    <div class="wf-tags text-muted">Tags</div>
-                  </div>
-                </div>
-              </a>
-            </div>
-          {% empty %}
-            <!-- Wireframe placeholders (Recipe Card 1..6) if no data yet -->
-            {% for i in "123456" %}
-              <div class="col-12 col-md-4">
-                <div class="wf-card">
-                  <div class="wf-card-label">Recipe Card {{ forloop.counter }}</div>
-
-                  <div class="wf-card-img">
-                    <div class="wf-img-placeholder">Image</div>
-                  </div>
-
-                  <div class="wf-card-body">
-                    <div class="wf-title">Title</div>
-                    <div class="wf-meta">
-                      <span class="wf-star"><i class="bi bi-star-fill"></i></span>
-                      <span class="me-2">rating</span>
-                      <span class="wf-clock"><i class="bi bi-clock"></i></span>
-                      <span>time</span>
-                    </div>
-                    <div class="wf-tags">Tags</div>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          {% endfor %}
-        </div>
-      </section>
-    </div>
-  </div>
-</div>
-{% endblock %}
-
-{% block content %}{% endblock %}
+  <script src="{% static 'recipes/js/save.js' %}"></script>
+</body>
+</html>

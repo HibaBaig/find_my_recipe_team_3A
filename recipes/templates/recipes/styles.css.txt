@@ -1,0 +1,18 @@
+/* to use this import <link rel="stylesheet" href="styles.css"> in the head*/
+
+body {
+	font-family:
+	background-color:
+
+
+}
+
+.header {
+
+}
+
+
+.footer {
+
+
+}

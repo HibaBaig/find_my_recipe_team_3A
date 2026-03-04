@@ -1,18 +1,30 @@
 <!doctype html>
 
-<head>
 
-</head>
 
+head {}
 
 body {
-	background-colour: #FBE7C8
-	border-left-color: #AED581
-	border-left-width: 25px
-	border-left-style: dashed
+	background-colour: #FBE7C8;
+	border-left-color: #AED581;
+	border-left-width: 25px;
+	border-left-style: dashed;
 }
 
 
 
 
-.recipecard {}
+.recipecard {
+
+	position: absolute;
+	width: 200px;
+	height: 250px;
+	background-color: #CAEDF1
+	/* <img src="{% static  %}" alt = ??? */
+
+}
+
+.header {}
+
+.footer {}
+

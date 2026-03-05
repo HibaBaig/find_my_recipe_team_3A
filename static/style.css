@@ -1,0 +1,107 @@
+
+/*standard styling*/
+body {
+	background-color: #FBE7C8;
+	border-left-color: #AED581;
+	border-left-width: 25px;
+	border-left-style: dashed;
+}
+
+h1 {
+  font-size: 20px;
+  font-family: "Avenir Next LT Pro", arial;
+  text-align: center;
+}
+
+.footer {
+	background-color: #FBE7C8;
+}
+
+/*recipecard componenets*/
+.recipecard {
+	position: relative;
+	width: 200px;
+	height: 250px;
+	background-color: #CAEDF1;
+  border-radius: 5px;
+}
+
+.recipetitle{
+  position: relative;
+  top: 20px;
+  left: 20px;
+
+  width: 160px;
+  height: 30px;
+  font-size: 16px;
+  font-family: "Avenir Next LT Pro", arial;
+  text-align: center;
+  /* white-space: nowrap; (maybe add at some point?) */
+}
+
+.recipeimage {
+  position: relative;
+  top: 60px;
+  left: 20px;
+
+  width: 160px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.recipecardsedcription {
+  position: relative;
+  top: 180px;
+  left: 20px;
+
+  width: 160px;
+  height: 60px;
+  font-size: 12px;
+  font-family: "Avenir Next LT Pro", arial;
+  text-align: center;
+}
+
+/*recipecard placement*/
+.recipe-grid {
+    display: flex;       
+    flex-wrap: wrap;     
+    gap: 20px;           
+    padding: 20px;       
+}
+
+
+/* header*/
+.header {
+	background-color: #fbe7c8;
+}
+
+.header-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px; 
+  padding: 10px;
+  background-color: #fff7db;
+  border: #000000;
+  border-radius: 3px;
+  border-width: 2px;
+}
+
+.logo {
+  position: relative;
+  top: 10px;
+  left: 10px;
+
+  width: px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.searchbar {}
+
+.button {
+  background-color: #fff7db;
+  color: #000000;
+  padding: 10px;
+  font-size: 18px;
+  text-align: center;
+}

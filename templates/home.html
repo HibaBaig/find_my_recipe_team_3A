@@ -6,27 +6,37 @@
   <title>Recipes</title>
 </head>
 <body>
-  <h1>Recipes</h1>
 
-  {% if user.is_authenticated %}
-    <p>Logged in as {{ user.username }}</p>
-  {% else %}
-    <p>Login to test Save (AJAX needs login).</p>
-  {% endif %}
+<h1>Recipes</h1>
 
-  {% for r in recipes %}
-    <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
-      <h3>{{ r.title }}</h3>
+{% if user.is_authenticated %}
+  <p>Logged in as {{ user.username }}</p>
+{% else %}
+  <p>Login to test saving recipes.</p>
+{% endif %}
 
-      {% if user.is_authenticated %}
-        <button class="save-btn" data-recipe-id="{{ r.id }}">Save</button>
-        Saves: <span id="save-count-{{ r.id }}">{{ r.saves.count }}</span>
-      {% endif %}
-    </div>
-  {% empty %}
-    <p>No recipes yet. Add one via /admin/</p>
-  {% endfor %}
+{% for r in recipes %}
+  <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
+    
+    <h3>{{ r.title }}</h3>
 
-  <script src="{% static 'recipes/js/save.js' %}"></script>
+    {% if user.is_authenticated %}
+      <button class="save-btn" data-recipe-id="{{ r.id }}">
+        Save
+      </button>
+
+      Saves:
+      <span id="save-count-{{ r.id }}">
+        {{ r.saves.count }}
+      </span>
+    {% endif %}
+
+  </div>
+{% empty %}
+  <p>No recipes yet. Add one via /admin/</p>
+{% endfor %}
+
+<script src="{% static 'recipes/js/save.js' %}"></script>
+
 </body>
 </html>

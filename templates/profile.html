@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Profile | Find My Recipe{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">My Profile</h4>
+    <a class="btn btn-outline-primary btn-sm" href="{% url 'recipe_create' %}">+ Add Recipe</a>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12 col-lg-5">
+      <div class="card p-3">
+        <h5>Account</h5>
+        <div class="text-muted small mb-2">Logged in as <strong>{{ user.username }}</strong></div>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ pform.as_p }}
+          <button class="btn btn-primary btn-sm" type="submit">Update Profile</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-7">
+      <div class="card p-3 mb-3">
+        <h5>Saved Recipes</h5>
+        {% for s in saved %}
+          <div class="d-flex justify-content-between border rounded p-2 mb-2">
+            <a class="text-decoration-none" href="{% url 'recipe_detail' s.recipe.id %}">{{ s.recipe.title }}</a>
+            <span class="text-muted small">{{ s.created_at|date:"M d" }}</span>
+          </div>
+        {% empty %}
+          <div class="text-muted">No saved recipes yet.</div>
+        {% endfor %}
+      </div>
+
+      <div class="card p-3">
+        <h5>My Recipes</h5>
+        {% for r in my_recipes %}
+          <div class="d-flex justify-content-between border rounded p-2 mb-2">
+            <a class="text-decoration-none" href="{% url 'recipe_detail' r.id %}">{{ r.title }}</a>
+            <span class="text-muted small">{{ r.created_at|date:"M d" }}</span>
+          </div>
+        {% empty %}
+          <div class="text-muted">You haven't created any recipes yet.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

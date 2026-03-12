@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Search | Find My Recipe{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h4 class="mb-3">Search</h4>
+
+  <form class="mb-4" method="get" action="{% url 'search' %}">
+    <div class="input-group">
+      <input class="form-control" name="q" placeholder="Search recipes or users..." value="{{ q }}">
+      <button class="btn btn-primary" type="submit">Search</button>
+    </div>
+  </form>
+
+  {% if q %}
+    <div class="row g-4">
+      <div class="col-12 col-lg-7">
+        <h5>Recipes</h5>
+        {% if recipe_results %}
+          <div class="list-group">
+            {% for r in recipe_results %}
+              <a class="list-group-item list-group-item-action" href="{% url 'recipe_detail' r.id %}">
+                <div class="d-flex justify-content-between">
+                  <strong>{{ r.title }}</strong>
+                  <span class="text-muted small">{{ r.created_at|date:"M d" }}</span>
+                </div>
+                <div class="text-muted small">{{ r.description|truncatechars:120 }}</div>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-muted">No recipes found.</div>
+        {% endif %}
+      </div>
+
+      <div class="col-12 col-lg-5">
+        <h5>Users</h5>
+        {% if user_results %}
+          <ul class="list-group">
+            {% for u in user_results %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ u.username }}</span>
+                <span class="text-muted small">{{ u.email }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-muted">No users found.</div>
+        {% endif %}
+      </div>
+    </div>
+  {% else %}
+    <div class="text-muted">Type a keyword and press search.</div>
+  {% endif %}
+</div>
+{% endblock %}
+

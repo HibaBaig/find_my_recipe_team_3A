@@ -1,42 +1,120 @@
-{% load static %}
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Recipes</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Home | Find My Recipe{% endblock %}
 
-<h1>Recipes</h1>
+{% block content %}
+<div class="container">
+  <div class="wireframe-shell">
+    <!-- Top row: Logo | Search | Surprise Me | Login/Profile -->
+    <div class="row g-3 align-items-center">
+      <div class="col-12 col-md-2">
+        <div class="wf-box wf-box-center">Logo</div>
+      </div>
 
-{% if user.is_authenticated %}
-  <p>Logged in as {{ user.username }}</p>
-{% else %}
-  <p>Login to test saving recipes.</p>
-{% endif %}
+      <div class="col-12 col-md-6">
+        <form method="get" action="{% url 'search' %}" class="wf-box p-2">
+          <input class="form-control wf-search" name="q" placeholder="Search recipes / ingredients..." value="{{ request.GET.q|default:'' }}">
+        </form>
+      </div>
 
-{% for r in recipes %}
-  <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
-    
-    <h3>{{ r.title }}</h3>
+      <div class="col-6 col-md-2">
+        <a href="{% url 'surprise_me' %}" class="wf-box wf-box-center text-decoration-none text-dark">Surprise Me</a>
+      </div>
 
-    {% if user.is_authenticated %}
-      <button class="save-btn" data-recipe-id="{{ r.id }}">
-        Save
-      </button>
+      <div class="col-6 col-md-2">
+        {% if user.is_authenticated %}
+          <a href="{% url 'profile' %}" class="wf-box wf-box-center text-decoration-none text-dark">Profile</a>
+        {% else %}
+          <a href="{% url 'login' %}" class="wf-box wf-box-center text-decoration-none text-dark">Login / Profile</a>
+        {% endif %}
+      </div>
+    </div>
 
-      Saves:
-      <span id="save-count-{{ r.id }}">
-        {{ r.saves.count }}
-      </span>
-    {% endif %}
+    <div class="row g-3 mt-1">
+      <aside class="col-12 col-lg-3">
+        <div class="wf-panel h-100">
+          <div class="wf-panel-title">Filters</div>
+          <div class="wf-panel-body">
+            <ul class="wf-bullets">
+              <li>Dietary: Vegan / GF / Halal</li>
+              <li>Time: &lt;15 / &lt;30</li>
+              <li>Tags: Quick / High-protein</li>
+              <li>Rating: 4+</li>
+              <li>Sort: New / Top</li>
+            </ul>
+            <div class="text-muted small mt-3">
+              (Filters are a UI placeholder in this demo. Search + Surprise Me are functional.)
+            </div>
+          </div>
+        </div>
+      </aside>
 
+      <section class="col-12 col-lg-9">
+        <div class="wf-section-title d-flex justify-content-between align-items-center">
+          <span>Featured / Trending</span>
+          {% if user.is_authenticated %}
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'recipe_create' %}">+ Add Recipe</a>
+          {% else %}
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'login' %}?next={% url 'recipe_create' %}">+ Add Recipe</a>
+          {% endif %}
+        </div>
+
+        <div class="row g-3">
+          {% for recipe in recipes %}
+            <div class="col-12 col-md-4">
+              <a class="text-decoration-none" href="{% url 'recipe_detail' recipe.id %}">
+                <div class="wf-card">
+                  <div class="wf-card-label">Recipe</div>
+
+                  <div class="wf-card-img">
+                    {% if recipe.image %}
+                      <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                    {% else %}
+                      <div class="wf-img-placeholder">Image</div>
+                    {% endif %}
+                  </div>
+
+                  <div class="wf-card-body">
+                    <div class="wf-title text-dark">{{ recipe.title }}</div>
+                    <div class="wf-meta">
+                      <span class="wf-star"><i class="bi bi-star-fill"></i></span>
+                      <span class="me-2">{{ recipe.avg_rating|default:"rating" }}</span>
+                      <span class="wf-clock"><i class="bi bi-clock"></i></span>
+                      <span>{{ recipe.total_time_minutes|default:"time" }} min</span>
+                    </div>
+                    <div class="wf-tags">
+                      {% for t in recipe.tags.all|slice:":3" %}
+                        <span class="badge text-bg-light border">{{ t.name }}</span>
+                      {% empty %}
+                        Tags
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          {% empty %}
+            {% for i in "123456" %}
+              <div class="col-12 col-md-4">
+                <div class="wf-card">
+                  <div class="wf-card-label">Recipe Card {{ forloop.counter }}</div>
+                  <div class="wf-card-img {% if forloop.counter == 3 %}wf-card-img-dashed{% endif %}">
+                    <div class="wf-img-placeholder">Image</div>
+                  </div>
+                  <div class="wf-card-body">
+                    <div class="wf-title">Title</div>
+                    <div class="wf-meta">
+                      <span class="wf-star"><i class="bi bi-star-fill"></i></span><span class="me-2">rating</span>
+                      <span class="wf-clock"><i class="bi bi-clock"></i></span><span>time</span>
+                    </div>
+                    <div class="wf-tags">Tags</div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </section>
+    </div>
   </div>
-{% empty %}
-  <p>No recipes yet. Add one via /admin/</p>
-{% endfor %}
-
-<script src="{% static 'recipes/js/save.js' %}"></script>
-
-</body>
-</html>
+</div>
+{% endblock %}

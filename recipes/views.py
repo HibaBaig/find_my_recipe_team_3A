@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.http import JsonResponse
 
 from .forms import SignUpForm, RecipeForm, RecipeIngredientFormSet, CommentForm, ProfileForm
 from .models import Recipe, Ingredient, RecipeIngredient, SavedRecipe, Friendship, Profile, Tag
@@ -121,15 +122,23 @@ def recipe_detail(request, recipe_id):
 
 @login_required
 def toggle_save(request, recipe_id):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
     recipe = get_object_or_404(Recipe, id=recipe_id)
     obj = SavedRecipe.objects.filter(user=request.user, recipe=recipe)
+
     if obj.exists():
         obj.delete()
-        messages.info(request, "Removed from saved recipes.")
+        saved = False
     else:
         SavedRecipe.objects.create(user=request.user, recipe=recipe)
-        messages.success(request, "Saved!")
-    return redirect("recipe_detail", recipe_id=recipe.id)
+        saved = True
+
+    return JsonResponse({
+        "saved": saved,
+        "save_count": SavedRecipe.objects.filter(recipe=recipe).count(),
+    })
 
 
 @login_required

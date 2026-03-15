@@ -20,17 +20,20 @@
 
     <div class="d-flex gap-2">
       {% if user.is_authenticated %}
-        <form method="post" action="{% url 'toggle_save' recipe.id %}">
-          {% csrf_token %}
-          {% if saved %}
-            <button class="btn btn-outline-secondary">Unsave</button>
-          {% else %}
-            <button class="btn btn-outline-primary">Save</button>
-          {% endif %}
-        </form>
-      {% else %}
-        <a class="btn btn-outline-primary" href="{% url 'login' %}?next={% url 'recipe_detail' recipe.id %}">Save</a>
-      {% endif %}
+       <button
+      type="button"
+      class="save-btn btn btn-outline-primary"
+      data-recipe-id="{{ recipe.id }}"
+      data-url="{% url 'toggle_save' recipe.id %}">
+      {% if saved %}Unsave{% else %}Save{% endif %}
+     </button>
+
+     <span class="ms-2 text-muted">
+      Saved by <span id="save-count-{{ recipe.id }}">{{ recipe.saves.count }}</span>
+     </span>
+    {% else %}
+    <a class="btn btn-outline-primary" href="{% url 'login' %}?next={% url 'recipe_detail' recipe.id %}">Save</a>
+    {% endif %}
 
       {% if user == recipe.author %}
         <a class="btn btn-outline-dark" href="{% url 'recipe_edit' recipe.id %}">Edit</a>

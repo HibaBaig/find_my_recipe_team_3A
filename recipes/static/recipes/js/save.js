@@ -2,21 +2,41 @@ function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop().split(";").shift();
+  return "";
 }
 
-document.addEventListener("click", async (e) => {
-  if (!e.target.classList.contains("save-btn")) return;
+document.addEventListener("click", async function (event) {
+  const button = event.target.closest(".save-btn");
+  if (!button) return;
 
-  const recipeId = e.target.dataset.recipeId;
+  event.preventDefault();
+
+  const url = button.dataset.url;
+  const recipeId = button.dataset.recipeId;
   const csrftoken = getCookie("csrftoken");
 
-  const res = await fetch(`/recipes/${recipeId}/toggle-save/`, {
-    method: "POST",
-    headers: { "X-CSRFToken": csrftoken },
-  });
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrftoken,
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    });
 
-  const data = await res.json();
+    if (!response.ok) {
+      throw new Error("Request failed");
+    }
 
-  e.target.textContent = data.saved ? "Saved ✓" : "Save";
-  document.getElementById(`save-count-${recipeId}`).textContent = data.save_count;
+    const data = await response.json();
+
+    button.textContent = data.saved ? "Unsave" : "Save";
+
+    const count = document.getElementById(`save-count-${recipeId}`);
+    if (count) {
+      count.textContent = data.save_count;
+    }
+  } catch (error) {
+    console.error("Save AJAX failed:", error);
+  }
 });

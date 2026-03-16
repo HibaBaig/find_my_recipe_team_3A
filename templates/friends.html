@@ -9,7 +9,7 @@
     <div class="col-12 col-lg-5">
       <div class="card p-3">
         <h5>Add friend</h5>
-        <form method="post" action="{% url 'add_friend' %}">
+        <form method="post" action="{% url 'recipes:add_friend' %}">
           {% csrf_token %}
           <div class="input-group">
             <input class="form-control" name="username" placeholder="Enter username">
@@ -22,7 +22,7 @@
         {% for req in incoming %}
           <div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2">
             <span>@{{ req.from_user.username }}</span>
-            <a class="btn btn-success btn-sm" href="{% url 'accept_friend' req.id %}">Accept</a>
+            <a class="btn btn-success btn-sm" href="{% url 'recipes:accept_friend' req.id %}">Accept</a>
           </div>
         {% empty %}
           <div class="text-muted">No incoming requests.</div>

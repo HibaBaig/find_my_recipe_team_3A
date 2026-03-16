@@ -5,7 +5,7 @@
 <div class="container">
   <h4 class="mb-3">Search</h4>
 
-  <form class="mb-4" method="get" action="{% url 'search' %}">
+  <form class="mb-4" method="get" action="{% url 'recipes:search' %}">
     <div class="input-group">
       <input class="form-control" name="q" placeholder="Search recipes or users..." value="{{ q }}">
       <button class="btn btn-primary" type="submit">Search</button>
@@ -19,7 +19,7 @@
         {% if recipe_results %}
           <div class="list-group">
             {% for r in recipe_results %}
-              <a class="list-group-item list-group-item-action" href="{% url 'recipe_detail' r.id %}">
+              <a class="list-group-item list-group-item-action" href="{% url 'recipes:recipe_detail' r.id %}">
                 <div class="d-flex justify-content-between">
                   <strong>{{ r.title }}</strong>
                   <span class="text-muted small">{{ r.created_at|date:"M d" }}</span>

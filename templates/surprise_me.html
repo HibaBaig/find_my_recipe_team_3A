@@ -5,7 +5,7 @@
 <div class="container">
   <h4 class="mb-3">Surprise Me</h4>
 
-  <form method="get" action="{% url 'surprise_me' %}" class="card p-3 mb-4">
+  <form method="get" action="{% url 'recipes:surprise_me' %}" class="card p-3 mb-4">
     <label class="form-label fw-semibold">Ingredients you have (comma-separated)</label>
     <input class="form-control mb-3" name="ingredients" value="{{ ingredient_str }}" placeholder="e.g., chicken, rice, garlic">
 
@@ -45,7 +45,7 @@
                 <div class="fw-semibold">{{ r.recipe.title }}</div>
                 <div class="text-muted small">Match: {{ r.match_percent }}%</div>
               </div>
-              <a class="btn btn-outline-primary btn-sm" href="{% url 'recipe_detail' r.recipe.id %}">View</a>
+              <a class="btn btn-outline-primary btn-sm" href="{% url 'recipes:recipe_detail' r.recipe.id %}">View</a>
             </div>
             {% if r.missing %}
               <div class="mt-2 small">

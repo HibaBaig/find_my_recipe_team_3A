@@ -5,7 +5,7 @@
 <div class="container">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mb-0">My Profile</h4>
-    <a class="btn btn-outline-primary btn-sm" href="{% url 'recipe_create' %}">+ Add Recipe</a>
+    <a class="btn btn-outline-primary btn-sm" href="{% url 'recipes:recipe_create' %}">+ Add Recipe</a>
   </div>
 
   <div class="row g-4">
@@ -26,7 +26,7 @@
         <h5>Saved Recipes</h5>
         {% for s in saved %}
           <div class="d-flex justify-content-between border rounded p-2 mb-2">
-            <a class="text-decoration-none" href="{% url 'recipe_detail' s.recipe.id %}">{{ s.recipe.title }}</a>
+            <a class="text-decoration-none" href="{% url 'recipes:recipe_detail' s.recipe.id %}">{{ s.recipe.title }}</a>
             <span class="text-muted small">{{ s.created_at|date:"M d" }}</span>
           </div>
         {% empty %}
@@ -38,7 +38,7 @@
         <h5>My Recipes</h5>
         {% for r in my_recipes %}
           <div class="d-flex justify-content-between border rounded p-2 mb-2">
-            <a class="text-decoration-none" href="{% url 'recipe_detail' r.id %}">{{ r.title }}</a>
+            <a class="text-decoration-none" href="{% url 'recipes:recipe_detail' r.id %}">{{ r.title }}</a>
             <span class="text-muted small">{{ r.created_at|date:"M d" }}</span>
           </div>
         {% empty %}

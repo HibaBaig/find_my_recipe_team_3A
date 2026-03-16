@@ -1,0 +1,120 @@
+.app-bg{
+  background:#ffffff;
+}
+
+/* Wireframe-style shell for the home page */
+.wireframe-shell{
+  border:1px solid #cfd4da;
+  padding:16px;
+  background:#fff;
+}
+
+/* Top row boxes */
+.wf-box{
+  border:1px solid #cfd4da;
+  background:#fff;
+  height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.wf-box-center{ width:100%; }
+
+.wf-search{
+  border:1px solid #cfd4da !important;
+  height:40px;
+  border-radius:0;
+}
+
+/* Filters panel */
+.wf-panel{
+  border:1px solid #cfd4da;
+  background:#fff;
+  min-height: 420px;
+}
+
+.wf-panel-title{
+  padding:10px 12px;
+  font-weight:600;
+  border-bottom:1px solid #cfd4da;
+}
+
+.wf-panel-body{ padding:12px; }
+
+.wf-bullets{
+  margin:0;
+  padding-left:18px;
+  color:#333;
+  line-height:1.6;
+}
+
+/* Section title */
+.wf-section-title{
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+/* Recipe cards */
+.wf-card{
+  border:1px solid #cfd4da;
+  background:#fff;
+  padding:10px;
+  height:100%;
+}
+
+.wf-card-label{
+  font-size:12px;
+  color:#6c757d;
+  margin-bottom:8px;
+}
+
+.wf-card-img{
+  border:1px solid #cfd4da;
+  height:120px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+  overflow:hidden;
+}
+
+.wf-card-img img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.wf-card-img-dashed{
+  border-style:dashed;
+}
+
+.wf-img-placeholder{
+  color:#6c757d;
+  font-size:14px;
+}
+
+.wf-card-body{ margin-top:10px; }
+
+.wf-title{
+  font-size:14px;
+  font-weight:600;
+  margin-bottom:6px;
+}
+
+.wf-meta{
+  font-size:12px;
+  color:#6c757d;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:6px;
+}
+
+.wf-star{ color:#f0ad4e; }
+.wf-clock{ color:#6c757d; }
+
+.wf-tags{
+  font-size:12px;
+  color:#6c757d;
+}

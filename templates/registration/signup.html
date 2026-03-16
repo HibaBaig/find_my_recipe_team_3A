@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Sign up | Find My Recipe{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 560px;">
+  <div class="card p-3">
+    <h4>Create account</h4>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn btn-primary" type="submit">Create account</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

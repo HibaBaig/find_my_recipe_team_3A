@@ -1,69 +1,8 @@
 {% load static %}
 <!doctype html>
 <html lang="en">
-<style>
-head {}
-
-body {
-	background-color: #FBE7C8;
-	border-left-color: #AED581;
-	border-left-width: 25px;
-	border-left-style: dashed;
-}
-
-.recipecard {
-	position: absolute;
-	width: 200px;
-	height: 250px;
-	background-color: #CAEDF1;
-  border-radius: 5px;
-}
-
-.recipetitle{
-  position: relative;
-  top: 20px;
-  left: 20px;
-
-  width: 160px;
-  height: 30px;
-  font-size: 14px;
-  font-family: "Avenir Next LT Pro", arial;
-  text-align: center;
-  /* white-space: nowrap; (maybe add at some point?) */
-}
-
-.recipeimage {
-  position: relative;
-  top: 60px;
-  left: 20px;
-
-  width: 160px;
-  height: 100px;
-  object-fit: cover;
-}
-
-.recipecardsedcription {
-  position: relative;
-  top: 180px;
-  left: 20px;
-
-  width: 160px;
-  height: 60px;
-  font-size: 12px;
-  font-family: "Avenir Next LT Pro", arial;
-  text-align: center;
-}
-
-.header {
-	background-color: #FBE7C8;
-}
-
-.footer {
-	background-color: #FBE7C8;
-}
-</style>
 <head>
-    <meta charset="utf-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}Find My Recipe{% endblock %}</title>
 
@@ -71,28 +10,79 @@ body {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
+  <style>
+    body {
+      background-color: #FBE7C8;
+      border-left: 25px dashed #AED581;
+    }
+
+    .recipecard {
+      position: absolute;
+      width: 200px;
+      height: 250px;
+      background-color: #CAEDF1;
+      border-radius: 5px;
+    }
+
+    .recipetitle {
+      position: relative;
+      top: 20px;
+      left: 20px;
+      width: 160px;
+      height: 30px;
+      font-size: 14px;
+      font-family: "Avenir Next LT Pro", arial;
+      text-align: center;
+    }
+
+    .recipeimage {
+      position: relative;
+      top: 60px;
+      left: 20px;
+      width: 160px;
+      height: 100px;
+      object-fit: cover;
+    }
+
+    .recipecardsedcription {
+      position: relative;
+      top: 180px;
+      left: 20px;
+      width: 160px;
+      height: 60px;
+      font-size: 12px;
+      font-family: "Avenir Next LT Pro", arial;
+      text-align: center;
+    }
+
+    .header,
+    .footer {
+      background-color: #FBE7C8;
+    }
+  </style>
+
   {% block extra_css %}{% endblock %}
 </head>
 <body class="app-bg">
 
 <nav class="navbar bg-white border-bottom sticky-top">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="{% url 'home' %}">Find My Recipe</a>
+    <a class="navbar-brand fw-bold" href="{% url 'recipes:home' %}">Find My Recipe</a>
 
-    <form class="d-none d-md-flex flex-grow-1 mx-3" method="get" action="{% url 'search' %}">
+    <form class="d-none d-md-flex flex-grow-1 mx-3" method="get" action="{% url 'recipes:search' %}">
       <input class="form-control" name="q" placeholder="Search recipes / users..." value="{{ request.GET.q|default:'' }}">
     </form>
 
     <div class="d-flex gap-2 align-items-center">
-      <a class="btn btn-outline-primary btn-sm" href="{% url 'surprise_me' %}">Surprise Me</a>
+      <a class="btn btn-outline-primary btn-sm" href="{% url 'recipes:surprise_me' %}">Surprise Me</a>
 
       {% if user.is_authenticated %}
-        <a class="btn btn-outline-secondary btn-sm" href="{% url 'friends' %}">Friends</a>
-        <a class="btn btn-primary btn-sm" href="{% url 'profile' %}">Profile</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'recipes:friends' %}">Friends</a>
+        <a class="btn btn-primary btn-sm" href="{% url 'recipes:profile' %}">Profile</a>
         <a class="btn btn-outline-dark btn-sm" href="{% url 'logout' %}">Logout</a>
       {% else %}
         <a class="btn btn-outline-dark btn-sm" href="{% url 'login' %}">Login</a>
-        <a class="btn btn-primary btn-sm" href="{% url 'signup' %}">Sign up</a>
+        <a class="btn btn-primary btn-sm" href="{% url 'recipes:signup' %}">Sign up</a>
       {% endif %}
     </div>
   </div>
@@ -105,23 +95,13 @@ body {
     {% endfor %}
   {% endif %}
 </div>
-  <main class="py-3">
-    {% block content %}{% endblock %}
-  </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{% static 'recipes/js/save.js' %}"></script>
-  {% block extra_js %}{% endblock %}
-  </body>
-  </html>
+<main class="py-3">
+  {% block content %}{% endblock %}
+</main>
 
-
-  <div class = "recipecard">
-    <div class = "recipetitle"> {{ recipetitle }}</div>
-    <div class = "recipedescription"> {{ recipedescription }}</div>
-    <img src="{{ recipe.image.url }}" class="recipeimage" alt="{{ recipe.title }}">
-  </div>
-
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'recipes/js/save.js' %}"></script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -24,7 +24,7 @@
       type="button"
       class="save-btn btn btn-outline-primary"
       data-recipe-id="{{ recipe.id }}"
-      data-url="{% url 'toggle_save' recipe.id %}">
+      data-url="{% url 'recipes:toggle_save' recipe.id %}">
       {% if saved %}Unsave{% else %}Save{% endif %}
      </button>
 

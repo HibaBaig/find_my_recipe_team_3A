@@ -1,33 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.forms import modelform_factory
 from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
+from .forms import RecipeForm, ProfileForm, CommentForm, SignUpForm
 from .models import Recipe, Ingredient, RecipeIngredient, SavedRecipe, Friendship, Profile, Tag
-
-
-# Temporary forms created here so the project runs without forms.py
-RecipeForm = modelform_factory(Recipe, exclude=[])
-
-ProfileForm = modelform_factory(Profile, exclude=["user"])
-
-CommentForm = None
-try:
-    from .models import Comment
-    CommentForm = modelform_factory(Comment, exclude=["user", "recipe"])
-except Exception:
-    CommentForm = None
-
-
-class SignUpForm(UserCreationForm):
-    class Meta(UserCreationForm.Meta):
-        model = User
-        fields = ("username", "password1", "password2")
 
 
 def home(request):
@@ -130,23 +110,22 @@ def recipe_detail(request, recipe_id):
 
     cform = None
 
-    if CommentForm is not None:
-        if request.method == "POST":
-            if not request.user.is_authenticated:
-                return redirect("login")
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return redirect("login")
 
-            cform = CommentForm(request.POST)
+        cform = CommentForm(request.POST)
 
-            if cform.is_valid():
-                c = cform.save(commit=False)
-                c.user = request.user
-                c.recipe = recipe
-                c.save()
+        if cform.is_valid():
+            c = cform.save(commit=False)
+            c.user = request.user
+            c.recipe = recipe
+            c.save()
 
-                messages.success(request, "Comment posted.")
-                return redirect("recipes:recipe_detail", recipe_id=recipe.id)
-        else:
-            cform = CommentForm()
+            messages.success(request, "Comment posted.")
+            return redirect("recipes:recipe_detail", recipe_id=recipe.id)
+    else:
+        cform = CommentForm()
 
     return render(request, "recipe_detail.html", {
         "recipe": recipe,
@@ -184,16 +163,9 @@ def recipe_create(request):
 
         if form.is_valid():
             recipe = form.save(commit=False)
-
-            if hasattr(recipe, "author"):
-                recipe.author = request.user
-
+            recipe.author = request.user
             recipe.save()
-
-            try:
-                form.save_m2m()
-            except Exception:
-                pass
+            form.save_m2m()
 
             _save_ingredient_rows(request, recipe)
 
@@ -214,7 +186,7 @@ def recipe_create(request):
 def recipe_edit(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
 
-    if hasattr(recipe, "author") and recipe.author != request.user:
+    if recipe.author != request.user:
         return HttpResponseForbidden("You can only edit your own recipes.")
 
     if request.method == "POST":
@@ -246,7 +218,7 @@ def recipe_edit(request, recipe_id):
 def recipe_delete(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
 
-    if hasattr(recipe, "author") and recipe.author != request.user:
+    if recipe.author != request.user:
         return HttpResponseForbidden("You can only delete your own recipes.")
 
     if request.method == "POST":

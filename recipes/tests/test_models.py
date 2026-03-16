@@ -3,7 +3,7 @@ from django.utils import timezone
 
 from recipes.models import Ingredient, Recipe, RecipeIngredient, SavedRecipe, Comment, Friendship
 
-class test_models(TestCase):
+class TestModels(TestCase):
 
     def setUp(self):
         #ingredient
@@ -21,10 +21,6 @@ class test_models(TestCase):
                                                 ingredient = self.ingredient,
                                                 quantity = "quantity",
                                                 unit = "unit") 
-        
-        #saved recipe
-
-        #comment
 
         #friendship
 
@@ -61,6 +57,29 @@ class test_models(TestCase):
         self.ingredient.delete()
         exists = RecipeIngredient.objects.filter(recipe=self.recipe, ingredient=self.ingredient).exists()
         self.assertFalse(exists)
+
+    def test_saved_recipe_creation(self):
+        saved_recipe = SavedRecipe(user="user", recipe=self.recipe, created_at=timezone.now())
+        saved_recipe.full_clean()
+        self.assertEqual(saved_recipe.user, "user")
+        self.assertEqual(saved_recipe.recipe, self.recipe)
+        self.assertEqual(saved_recipe.created_at, timezone.now())
+
+    def test_comment_creation(self):
+        comment = Comment(recipe=self.recipe, user="user", text="text", created_at=timezone.now())
+        comment.full_clean()
+        self.assertEqual(comment.recipe, self.recipe)
+        self.assertEqual(comment.user, "user")
+        self.assertEqual(comment.text, "text")
+        self.assertEqual(comment.created_at, timezone.now())
+
+    def test_friendship_creation(self):
+        friendship = Friendship(from_user="from_user", to_user="to_user", status="pending", created_at=timezone.now())
+        friendship.full_clean()
+        self.assertEqual(friendship.from_user, "from_user")
+        self.assertEqual(friendship.to_user, "to_user")
+        self.assertEqual(friendship.status, "pending")
+        self.assertEqual(friendship.created_at, timezone.now())
 
         
 

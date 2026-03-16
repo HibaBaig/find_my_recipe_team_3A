@@ -6,14 +6,8 @@ from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 
-<<<<<<< HEAD
-
-from .models import Recipe, SavedRecipe
-
-=======
 from .forms import SignUpForm, RecipeForm, RecipeIngredientFormSet, CommentForm, ProfileForm
 from .models import Recipe, Ingredient, RecipeIngredient, SavedRecipe, Friendship, Profile, Tag
->>>>>>> b900e44cc34a2750f2f9451310acb218980f905a
 
 def home(request):
     # Simple "featured/trending" = newest 6

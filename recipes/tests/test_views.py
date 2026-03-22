@@ -48,11 +48,18 @@ class TestViews(TestCase):
         response = self.client.post(reverse("toggle_save"))
         self.assertEqual(response.status_code, 302)
 
-    def test_toggle_save_view(self):
+    def test_toggle_save_view_saved(self):
         recipe = self.new_recipe()
         self.assertFalse(SavedRecipe.objects.filter(user=self.user, recipe=recipe).exists())
         self.client.post(reverse("toggle_save", args=[recipe.id]))
         self.assertTrue(SavedRecipe.objects.filter(user=self.user, recipe=recipe).exists())
+
+    def test_toggle_save_view_unsaved(self):
+        recipe = self.new_recipe()
+        SavedRecipe.objects.create(user=self.user, recipe=recipe)
+        self.assertTrue(SavedRecipe.objects.filter(user=self.user, recipe=recipe).exists())
+        self.client.post(reverse("toggle_save", args=[recipe.id]))
+        self.assertFalse(SavedRecipe.objects.filter(user=self.user, recipe=recipe).exists())
 
     #recipe edit
     def test_recipe_edit_view_login_required(self):

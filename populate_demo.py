@@ -26,8 +26,8 @@ def main():
         u.set_password("demo12345")
         u.save()
         profile, _ = Profile.objects.get_or_create(user=u)
-        profile.dietary_preferences.set([vegan, gf])  # ⚡ CHANGE: use .set() with objects, not string
-        profile.save()  # ⚡ CHANGE: save after setting ManyToManyField
+        profile.dietary_preferences.set([vegan, gf])
+        profile.save()
         
     # recipes
     if Recipe.objects.filter(author=u).exists():

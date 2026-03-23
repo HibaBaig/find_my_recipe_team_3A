@@ -1,11 +1,11 @@
 
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "find_my_recipe.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 import django
 django.setup()
 
 from django.contrib.auth.models import User
-from fmr.models import Recipe, Ingredient, RecipeIngredient, Tag, Profile
+from recipes.models import Recipe, Ingredient, RecipeIngredient, Tag, Profile
 
 def get_or_create_tag(name, slug):
     return Tag.objects.get_or_create(name=name, slug=slug)[0]
@@ -25,8 +25,10 @@ def main():
     if created:
         u.set_password("demo12345")
         u.save()
-        Profile.objects.get_or_create(user=u, dietary_preferences="vegan,gf")
-
+        profile, _ = Profile.objects.get_or_create(user=u)
+        profile.dietary_preferences.set([vegan, gf])  # ⚡ CHANGE: use .set() with objects, not string
+        profile.save()  # ⚡ CHANGE: save after setting ManyToManyField
+        
     # recipes
     if Recipe.objects.filter(author=u).exists():
         print("Demo recipes already exist.")
@@ -37,7 +39,8 @@ def main():
         title="Garlic Chicken Rice",
         description="Simple chicken and rice with garlic.",
         steps="1) Cook chicken\n2) Add garlic\n3) Add rice and simmer",
-        total_time_minutes=25,
+        prep_time_minutes=10,
+        cook_time_minutes=15,
         servings=2
     )
     r1.tags.add(halal, quick)
@@ -51,7 +54,8 @@ def main():
         title="Vegan Chickpea Salad",
         description="Fresh salad with chickpeas and lemon.",
         steps="1) Mix ingredients\n2) Add dressing\n3) Serve chilled",
-        total_time_minutes=10,
+        prep_time_minutes=5,
+        cook_time_minutes=5,
         servings=2
     )
     r2.tags.add(vegan, gf, quick)
@@ -66,7 +70,8 @@ def main():
         title="Spicy Thai Noodles",
         description="Quick noodles with a spicy peanut sauce.",
         steps="1) Cook noodles\n2) Mix sauce\n3) Toss noodles with sauce",
-        total_time_minutes=20,
+        prep_time_minutes=10,
+        cook_time_minutes=10,
         servings=2
     )
     r3.tags.add(spicy, quick, budget)
@@ -81,7 +86,8 @@ def main():
         title="Budget Bean Chili",
         description="Hearty and cheap chili with beans and vegetables.",
         steps="1) Sauté vegetables\n2) Add beans and tomatoes\n3) Simmer",
-        total_time_minutes=35,
+        prep_time_minutes=10,
+        cook_time_minutes=25,
         servings=4
     )
     r4.tags.add(vegan, gf, spicy, budget)
@@ -96,7 +102,8 @@ def main():
         title="Spicy Shrimp Tacos",
         description="Tacos with a spicy shrimp filling and fresh salsa.",
         steps="1) Cook shrimp with spices\n2) Assemble tacos with salsa\n3) Serve with lime",
-        total_time_minutes=25,
+        prep_time_minutes=10,
+        cook_time_minutes=15,
         servings=2
     )
     r5.tags.add(spicy, halal, quick)
@@ -111,7 +118,8 @@ def main():
         title="Budget Veggie Stir-Fry",
         description="Quick and cheap vegetable stir-fry.",
         steps="1) Chop veggies\n2) Stir-fry in oil\n3) Serve with rice",
-        total_time_minutes=15,
+        prep_time_minutes=5,
+        cook_time_minutes=10,
         servings=2
     )
     r6.tags.add(vegan, quick, budget)

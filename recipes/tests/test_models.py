@@ -22,17 +22,12 @@ class TestModels(TestCase):
                                                 quantity = "quantity",
                                                 unit = "unit") 
 
-        #friendship
-
-        
         self.recipe.full_clean()
         self.ingredient.full_clean()
         self.recipeingredient.full_clean()
         self.recipe.save()
         self.ingredient.save()
         self.recipeingredient.save()
-
-
 
     def test_ingredient_creation(self):
         self.ingredient.full_clean()

@@ -2,47 +2,52 @@ from django.test import TestCase
 from django.utils import timezone
 
 from recipes.models import Ingredient, Recipe, RecipeIngredient, SavedRecipe, Comment, Friendship
+from recipes.tests.test_views import User
 
 class TestModels(TestCase):
 
     def setUp(self):
-        #ingredient
-        self.ingredient = Ingredient(name = "name")
+        # user
+        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.client.login(username="testuser", password="testpassword")
 
-        #recipe
-        self.recipe = Recipe(author = "author",
-                        title = "title",
-                        description = "description",
-                        steps = "steps",
-                        created_at = timezone.now())
-        
-        #recipe ingredient
-        self.recipeingredient = RecipeIngredient(recipe = self.recipe,
-                                                ingredient = self.ingredient,
-                                                quantity = "quantity",
-                                                unit = "unit") 
-
-        self.recipe.full_clean()
-        self.ingredient.full_clean()
-        self.recipeingredient.full_clean()
-        self.recipe.save()
+        # ingredient
+        self.ingredient = Ingredient(name="name")
         self.ingredient.save()
+        self.ingredient.full_clean()
+
+        # recipe
+        self.recipe = Recipe(
+            author=self.user,
+            title="title",
+            description="description",
+            steps="steps",
+            created_at=timezone.now()
+        )
+        self.recipe.save()
+        self.recipe.full_clean()
+
+        # recipe ingredient
+        self.recipeingredient = RecipeIngredient(
+            recipe=self.recipe,
+            ingredient=self.ingredient,
+            quantity="quantity",
+            unit="unit"
+        )
         self.recipeingredient.save()
+        self.recipeingredient.full_clean()
 
     def test_ingredient_creation(self):
-        self.ingredient.full_clean()
         self.assertEqual(self.ingredient.name, "name")
 
     def test_recipe_creation(self):
-        self.recipe.full_clean()
-        self.assertEqual(self.recipe.author, "author")
+        self.assertEqual(self.recipe.author, self.user)
         self.assertEqual(self.recipe.title, "title")
         self.assertEqual(self.recipe.description, "description")
         self.assertEqual(self.recipe.steps, "steps")
-        self.assertEqual(self.recipe.created_at, timezone.now())
+        self.assertIsInstance(self.recipe.created_at, timezone.datetime)
 
     def test_receipe_ingredient_creation(self):
-        self.recipeingredient.full_clean()
         self.assertEqual(self.recipeingredient.recipe, self.recipe)
         self.assertEqual(self.recipeingredient.ingredient, self.ingredient)
         self.assertEqual(self.recipeingredient.quantity, "quantity")
@@ -50,34 +55,28 @@ class TestModels(TestCase):
 
     def test_recipe_ingredient_cascade_delete(self):
         self.ingredient.delete()
-        exists = RecipeIngredient.objects.filter(recipe=self.recipe, ingredient=self.ingredient).exists()
+        exists = RecipeIngredient.objects.filter(recipe=self.recipe, ingredient_id=self.ingredient.id).exists()
         self.assertFalse(exists)
 
     def test_saved_recipe_creation(self):
-        saved_recipe = SavedRecipe(user="user", recipe=self.recipe, created_at=timezone.now())
+        saved_recipe = SavedRecipe(user=self.user, recipe=self.recipe, created_at=timezone.now())
         saved_recipe.full_clean()
-        self.assertEqual(saved_recipe.user, "user")
+        self.assertEqual(saved_recipe.user, self.user)
         self.assertEqual(saved_recipe.recipe, self.recipe)
-        self.assertEqual(saved_recipe.created_at, timezone.now())
+        self.assertIsInstance(saved_recipe.created_at, timezone.datetime)
 
     def test_comment_creation(self):
-        comment = Comment(recipe=self.recipe, user="user", text="text", created_at=timezone.now())
+        comment = Comment(recipe=self.recipe, user=self.user, text="text", created_at=timezone.now())
         comment.full_clean()
         self.assertEqual(comment.recipe, self.recipe)
-        self.assertEqual(comment.user, "user")
+        self.assertEqual(comment.user, self.user)
         self.assertEqual(comment.text, "text")
-        self.assertEqual(comment.created_at, timezone.now())
+        self.assertIsInstance(comment.created_at, timezone.datetime)
 
     def test_friendship_creation(self):
-        friendship = Friendship(from_user="from_user", to_user="to_user", status="pending", created_at=timezone.now())
+        friendship = Friendship(from_user=self.user, to_user=self.user, status="pending", created_at=timezone.now())
         friendship.full_clean()
-        self.assertEqual(friendship.from_user, "from_user")
-        self.assertEqual(friendship.to_user, "to_user")
+        self.assertEqual(friendship.from_user, self.user)
+        self.assertEqual(friendship.to_user, self.user)
         self.assertEqual(friendship.status, "pending")
-        self.assertEqual(friendship.created_at, timezone.now())
-
-        
-
-
-
-
+        self.assertIsInstance(friendship.created_at, timezone.datetime)

@@ -360,6 +360,54 @@ a{
   box-shadow: 0 0 0 0.2rem rgba(155, 183, 154, 0.16);
 }
 
+.profile-form .form-group{
+  margin-bottom: 24px;
+}
+
+.profile-form label{
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #223222;
+}
+
+.profile-form input[type="file"],
+.profile-form textarea,
+.profile-form select {
+    width: 100%;
+    border: 1px solid #d9e2d6;
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: #fff;
+}
+
+.profile-form textarea {
+    min-height: 220px;
+    resize: vertical;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.checkbox-item {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    font-weight: 400 !important;
+    margin-bottom: 0 !important;
+    cursor: pointer;
+}
+
+.checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
 .list-card{
   padding: 1.35rem;
 }
@@ -541,4 +589,74 @@ a{
   .friend-search{
     grid-template-columns: 1fr;
   }
+}
+
+.recipe-form .form-group {
+    margin-bottom: 20px;
+}
+
+.recipe-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.recipe-form input,
+.recipe-form textarea,
+.recipe-form select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #d9e2d6;
+}
+
+.recipe-form textarea {
+    min-height: 120px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.checkbox-item {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid #d9e2d6;
+    background: #fff;
+    cursor: pointer;
+}
+
+.ingredient-table {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ingredient-head,
+.ingredient-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 10px;
+}
+
+.ingredient-row input {
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #d9e2d6;
+}
+
+.recipe-container {
+    max-width: 1200px;
+    margin: 0 auto;
 }

@@ -22,18 +22,22 @@
       <input class="form-control" name="q" placeholder="Search recipes / users..." value="{{ request.GET.q|default:'' }}">
     </form>
 
-    <div class="d-flex gap-2 align-items-center flex-wrap">
-      <a class="btn btn-outline-primary btn-sm" href="{% url 'recipes:surprise_me' %}">Surprise Me</a>
+<div class="d-flex gap-2 align-items-center flex-wrap">
+  <a class="btn btn-outline-primary btn-sm" href="{% url 'recipes:surprise_me' %}">Surprise Me</a>
 
-      {% if user.is_authenticated %}
-        <a class="btn btn-outline-secondary btn-sm" href="{% url 'recipes:friends' %}">Friends</a>
-        <a class="btn btn-primary btn-sm" href="{% url 'recipes:profile' %}">Profile</a>
-        <a class="btn btn-outline-dark btn-sm" href="{% url 'logout' %}">Logout</a>
-      {% else %}
-        <a class="btn btn-outline-dark btn-sm" href="{% url 'login' %}">Login</a>
-        <a class="btn btn-primary btn-sm" href="{% url 'recipes:signup' %}">Sign up</a>
-      {% endif %}
-    </div>
+  {% if user.is_authenticated %}
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'recipes:friends' %}">Friends</a>
+    <a class="btn btn-primary btn-sm" href="{% url 'recipes:profile' %}">Profile</a>
+
+    <form method="post" action="{% url 'logout' %}" class="d-inline">
+      {% csrf_token %}
+      <button class="btn btn-outline-dark btn-sm" type="submit">Logout</button>
+    </form>
+  {% else %}
+    <a class="btn btn-outline-dark btn-sm" href="{% url 'login' %}">Login</a>
+    <a class="btn btn-primary btn-sm" href="{% url 'recipes:signup' %}">Sign up</a>
+  {% endif %}
+</div>
   </div>
 </nav>
 

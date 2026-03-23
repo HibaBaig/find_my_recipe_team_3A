@@ -253,12 +253,30 @@ def profile(request):
     })
 
 
+from django.contrib import messages
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.db.models import Q
+from django.http import HttpResponseForbidden, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
+
+from .forms import RecipeForm, ProfileForm, CommentForm, SignUpForm
+from .models import Recipe, Ingredient, RecipeIngredient, SavedRecipe, Friendship, Profile, Tag
+
+
 @login_required
 def friends(request):
     incoming = Friendship.objects.filter(
         to_user=request.user,
         status=Friendship.PENDING
     ).select_related("from_user")
+
+    sent_requests = Friendship.objects.filter(
+        from_user=request.user,
+        status=Friendship.PENDING
+    ).select_related("to_user")
 
     accepted_out = Friendship.objects.filter(
         from_user=request.user,
@@ -280,11 +298,13 @@ def friends(request):
 
     return render(request, "friends.html", {
         "incoming": incoming,
+        "sent_requests": sent_requests,
         "friends_list": friends_list,
     })
 
 
 @login_required
+@require_POST
 def add_friend(request):
     username = (request.POST.get("username") or "").strip()
 
@@ -292,26 +312,76 @@ def add_friend(request):
         messages.error(request, "Enter a username.")
         return redirect("recipes:friends")
 
-    if username == request.user.username:
+    if username.lower() == request.user.username.lower():
         messages.error(request, "You can't add yourself.")
         return redirect("recipes:friends")
 
-    to_user = User.objects.filter(username=username).first()
+    to_user = User.objects.filter(username__iexact=username).first()
 
     if not to_user:
-        messages.error(request, "User not found.")
+        messages.error(request, f"No user found with username '{username}'.")
         return redirect("recipes:friends")
 
-    obj, created = Friendship.objects.get_or_create(
+    
+    already_friends = Friendship.objects.filter(
+        (
+            Q(from_user=request.user, to_user=to_user) |
+            Q(from_user=to_user, to_user=request.user)
+        ),
+        status=Friendship.ACCEPTED
+    ).exists()
+
+    if already_friends:
+        messages.info(request, f"You are already friends with {to_user.username}.")
+        return redirect("recipes:friends")
+
+    
+    reverse_request = Friendship.objects.filter(
+        from_user=to_user,
+        to_user=request.user,
+        status=Friendship.PENDING
+    ).first()
+
+    if reverse_request:
+        reverse_request.status = Friendship.ACCEPTED
+        reverse_request.save()
+        messages.success(request, f"You are now friends with {to_user.username}.")
+        return redirect("recipes:friends")
+
+    
+    existing_request = Friendship.objects.filter(
         from_user=request.user,
-        to_user=to_user
+        to_user=to_user,
+        status=Friendship.PENDING
+    ).first()
+
+    if existing_request:
+        messages.info(request, f"Friend request already sent to {to_user.username}.")
+        return redirect("recipes:friends")
+
+    Friendship.objects.create(
+        from_user=request.user,
+        to_user=to_user,
+        status=Friendship.PENDING
+    )
+    messages.success(request, f"Friend request sent to {to_user.username}.")
+    return redirect("recipes:friends")
+
+
+@login_required
+@require_POST
+def accept_friend(request, req_id):
+    fr = get_object_or_404(
+        Friendship,
+        id=req_id,
+        to_user=request.user,
+        status=Friendship.PENDING
     )
 
-    if created:
-        messages.success(request, f"Friend request sent to {to_user.username}.")
-    else:
-        messages.info(request, "Request already exists.")
+    fr.status = Friendship.ACCEPTED
+    fr.save()
 
+    messages.success(request, f"You are now friends with {fr.from_user.username}.")
     return redirect("recipes:friends")
 
 

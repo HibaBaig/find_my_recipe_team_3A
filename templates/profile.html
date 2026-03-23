@@ -50,7 +50,29 @@
 
         <form method="post" enctype="multipart/form-data" class="profile-form">
           {% csrf_token %}
-          {{ pform.as_p }}
+
+          <div class="form-group">
+            <label for="{{ pform.avatar.id_for_label }}">Change:</label>
+            {{ pform.avatar }}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ pform.bio.id_for_label }}">Bio:</label>
+            {{ pform.bio }}
+          </div>
+
+          <div class="form-group">
+            <label>Dietary preferences:</label>
+            <div class="checkbox-group">
+              {% for checkbox in pform.dietary_preferences %}
+                <label class="checkbox-item">
+                  {{ checkbox.tag }}
+                  <span>{{ checkbox.choice_label }}</span>
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+
           <button class="btn btn-primary btn-sm mt-2" type="submit">Update Profile</button>
         </form>
       </div>

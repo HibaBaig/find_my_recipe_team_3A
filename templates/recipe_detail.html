@@ -20,20 +20,20 @@
 
     <div class="d-flex gap-2">
       {% if user.is_authenticated %}
-       <button
-      type="button"
-      class="save-btn btn btn-outline-primary"
-      data-recipe-id="{{ recipe.id }}"
-      data-url="{% url 'recipes:toggle_save' recipe.id %}">
-      {% if saved %}Unsave{% else %}Save{% endif %}
-     </button>
+        <button
+          type="button"
+          class="save-btn btn btn-outline-primary"
+          data-recipe-id="{{ recipe.id }}"
+          data-url="{% url 'recipes:toggle_save' recipe.id %}">
+          {% if saved %}Unsave{% else %}Save{% endif %}
+        </button>
 
-     <span class="ms-2 text-muted">
-      Saved by <span id="save-count-{{ recipe.id }}">{{ recipe.saves.count }}</span>
-     </span>
-    {% else %}
-    <a class="btn btn-outline-primary" href="{% url 'recipes:relogin' %}?next={% url 'recipes:recipe_detail' recipe.id %}">Save</a>
-    {% endif %}
+        <span class="ms-2 text-muted">
+          Saved by <span id="save-count-{{ recipe.id }}">{{ recipe.saves.count }}</span>
+        </span>
+      {% else %}
+        <a class="btn btn-outline-primary" href="{% url 'login' %}?next={% url 'recipes:recipe_detail' recipe.id %}">Save</a>
+      {% endif %}
 
       {% if user == recipe.author %}
         <a class="btn btn-outline-dark" href="{% url 'recipes:recipe_edit' recipe.id %}">Edit</a>
@@ -44,6 +44,19 @@
 
   <div class="row g-4 mt-2">
     <div class="col-12 col-lg-6">
+      <div class="card p-3 mb-3">
+        <h5>Recipe Image</h5>
+        {% if recipe.image %}
+          <img
+            src="{{ recipe.image.url }}"
+            alt="{{ recipe.title }}"
+            style="width: 100%; max-height: 360px; object-fit: cover; border-radius: 14px;"
+          >
+        {% else %}
+          <div class="text-muted">No image uploaded.</div>
+        {% endif %}
+      </div>
+
       <div class="card p-3">
         <h5>Ingredients</h5>
         {% if ingredients %}
@@ -95,11 +108,10 @@
             <button class="btn btn-primary btn-sm" type="submit">Post comment</button>
           </form>
         {% else %}
-          <a class="btn btn-outline-primary btn-sm" href="{% url 'recipes:login' %}?next={% url 'recipes:recipe_detail' recipe.id %}">Login to comment</a>
+          <a class="btn btn-outline-primary btn-sm" href="{% url 'login' %}?next={% url 'recipes:recipe_detail' recipe.id %}">Login to comment</a>
         {% endif %}
       </div>
     </div>
   </div>
-
 </div>
 {% endblock %}

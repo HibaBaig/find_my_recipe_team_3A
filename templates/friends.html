@@ -22,7 +22,7 @@
         </form>
 
         <p class="friend-hint">
-          Search for another user's username and send them a friend request.
+          Enter another user's exact username to send them a friend request.
         </p>
 
         <hr>
@@ -37,12 +37,30 @@
               <span>@{{ req.from_user.username }}</span>
             </div>
 
-            <a class="btn btn-success btn-sm" href="{% url 'recipes:accept_friend' req.id %}">
-              Accept
-            </a>
+            <form method="post" action="{% url 'recipes:accept_friend' req.id %}">
+              {% csrf_token %}
+              <button class="btn btn-success btn-sm" type="submit">Accept</button>
+            </form>
           </div>
         {% empty %}
           <div class="empty-state">No incoming requests.</div>
+        {% endfor %}
+
+        <hr>
+
+        <h6 class="mb-3">Sent Requests</h6>
+        {% for req in sent_requests %}
+          <div class="friend-list-item">
+            <div class="friend-chip">
+              <span class="friend-chip-icon">
+                <i class="bi bi-hourglass-split"></i>
+              </span>
+              <span>@{{ req.to_user.username }}</span>
+            </div>
+            <span class="item-meta">Pending</span>
+          </div>
+        {% empty %}
+          <div class="empty-state">No sent requests.</div>
         {% endfor %}
       </div>
     </div>

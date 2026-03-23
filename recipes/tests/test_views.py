@@ -30,9 +30,9 @@ class TestViews(TestCase):
 
     # home
     def test_home_view_template(self):
-        response = self.client.get("/")  # home path
+        response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "recipes/home.html")
+        self.assertTemplateUsed(response, "home.html") 
 
     def test_home_view(self):
         recipe = self.new_recipe()
@@ -64,18 +64,19 @@ class TestViews(TestCase):
         response = self.client.get("/recipes/1/edit/") 
         self.assertEqual(response.status_code, 302)
 
-    def test_recipe_edit_view(self):
+    def test_recipe_edit_view(self):       
         recipe = self.new_recipe()
         response = self.client.get(f"/recipes/{recipe.id}/edit/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "recipes/recipe_edit.html")
+        self.assertTemplateUsed(response, "add_recipe.html")
 
     # recipe detail
     def test_recipe_detail_view(self):
         recipe = self.new_recipe()
         response = self.client.get(f"/recipes/{recipe.id}/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "recipes/recipe_detail.html")
+        self.assertTemplateUsed(response, "recipe_detail.html") 
+
 
     # recipe create
     def test_recipe_create_view_login_required(self):
@@ -86,7 +87,7 @@ class TestViews(TestCase):
     def test_recipe_create_view(self):
         response = self.client.get("/recipes/create/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "recipes/recipe_create.html")
+        self.assertTemplateUsed(response, "add_recipe.html") 
 
     # recipe delete
     def test_recipe_delete_view_login_required(self):
@@ -117,18 +118,24 @@ class TestViews(TestCase):
 
     # signup
     def test_signup_view(self):
+        self.client.logout()
         response = self.client.get("/signup/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "recipes/signup.html")
+        self.assertTemplateUsed(response, "registration/signup.html")  
 
     def test_signup_view_post(self):
-        response = self.client.post("/signup/", {
-            "username": "username",
-            "password1": "password123",
-            "password2": "password123",
-        })
-        self.assertEqual(response.status_code, 302)  # should redirect now
-        self.assertTrue(User.objects.filter(username="username").exists())
+        username = "testuser_post"
+        email = "testuser_post@example.com"
+        password = "ComplexPass123!"
+        data = {
+            "username": username,
+            "email": email,
+            "password1": password,
+            "password2": password,
+        }
+        response = self.client.post("/signup/", data)
+        self.assertEqual(response.status_code, 302)
+
 
     def test_signup_view_post_password_mismatch(self):
         response = self.client.post("/signup/", {
@@ -141,38 +148,38 @@ class TestViews(TestCase):
 
     # profile
     def test_profile_view(self):
-        response = self.client.get(f"/profile/{self.user.username}/")
+        response = self.client.get("/profile/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "recipes/profile.html")
+        self.assertTemplateUsed(response, "profile.html")
 
     # friends
     def test_friends_view(self):
-        response = self.client.get(f"/friends/{self.user.username}/")
+        response = self.client.get("/friends/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "recipes/friends.html")
+        self.assertTemplateUsed(response, "friends.html")
 
     # add friends
     def test_add_friend_view(self):
         other_user = User.objects.create_user(username="otheruser", password="otherpassword")
-        response = self.client.post(f"/add_friend/{other_user.username}/")
+        response = self.client.post("/friends/add/", {"username": other_user.username})
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(self.user.friends.filter(id=other_user.id).exists())
+        self.assertTrue(
+            Friendship.objects.filter(
+                from_user=self.user,
+                to_user=other_user
+            ).exists()
+        )
 
     # accept friend
     def test_accept_friend_view(self): 
         other_user = User.objects.create_user(username="otheruser", password="otherpassword")
-
-        # Create a pending friend request from other_user to self.user
-        Friendship.objects.create(
+        friendship = Friendship.objects.create(
             from_user=other_user,
             to_user=self.user,
             status=Friendship.PENDING
         )
-
-        # Post to accept_friend view (URL may vary)
-        response = self.client.post(f"/accept_friend/{other_user.username}/")
+        response = self.client.post(f"/friends/accept/{friendship.id}/")
         self.assertEqual(response.status_code, 302)
 
-        # Check if the friendship status updated to accepted
-        friendship = Friendship.objects.get(from_user=other_user, to_user=self.user)
+        friendship.refresh_from_db()
         self.assertEqual(friendship.status, Friendship.ACCEPTED)

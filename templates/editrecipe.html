@@ -1,31 +1,91 @@
 {% extends "base.html" %}
+{% block title %}Edit Recipe | Find My Recipe{% endblock %}
 
-<div class="misc-container">
-    <div class="recipe-edit-main">
-        <h1>{{recipe-title}}</h1>
-        <br>
-        <p>{{recipe-description}}</p>
-        <br>
-        
-        <div class="misc-container"><p>Prep Time: {{prep-time}}</p></div>
-        <div class="misc-container"><p>Cook Time: {{cook-time}}</p></div>
-        <div class="misc-container"><p>Servings: {{servings}}</p></div>
-        <br>
+{% block content %}
+<div class="container">
+  <div class="recipe-editor-shell">
+    <div class="recipe-editor-header">
+      <div>
+        <h1 class="section-heading mb-1">Edit Recipe</h1>
+        <p class="section-subtitle">Update your recipe details, ingredients, method, and image.</p>
+      </div>
 
-        <h2>Method:</h2>
-        <br>
-        <p>{{method}}</p>
-
-        <!-- im going to leave the tags section incase we want them to be buttons-->
+      <div class="recipe-editor-actions">
+        <a href="#" class="btn btn-outline-secondary btn-sm">Cancel</a>
+        <button class="btn btn-primary btn-sm" type="button">Save Changes</button>
+      </div>
     </div>
-</div>
 
-<div class="misc-container"> <!--the formatting def wont work, but cant be fixed until we see the page-->
-    <div class="recipe-edit-ingredients-builder">
+    <div class="editor-grid">
+      <div class="editor-main">
+        <div class="editor-section mb-3">
+          <h5>Recipe Information</h5>
 
+          <div class="mb-3">
+            <label class="form-label">Recipe Title</label>
+            <input type="text" class="form-control" placeholder="Enter recipe title">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Short Description</label>
+            <textarea class="form-control" rows="3" placeholder="Write a short description of your recipe"></textarea>
+          </div>
+
+          <div class="meta-grid">
+            <div>
+              <label class="form-label">Prep Time</label>
+              <input type="text" class="form-control" placeholder="e.g. 10 mins">
+            </div>
+
+            <div>
+              <label class="form-label">Cook Time</label>
+              <input type="text" class="form-control" placeholder="e.g. 25 mins">
+            </div>
+
+            <div>
+              <label class="form-label">Servings</label>
+              <input type="number" class="form-control" placeholder="e.g. 4">
+            </div>
+          </div>
+        </div>
+
+        <div class="editor-section mb-3">
+          <h5>Method</h5>
+          <textarea class="form-control" rows="8" placeholder="Write the cooking steps here..."></textarea>
+        </div>
+
+        <div class="editor-section">
+          <h5>Ingredients Builder</h5>
+          <div class="placeholder-box">
+            Ingredient search / add area<br>
+            Table of ingredient name, quantity, unit, and remove button
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-side">
+        <div class="editor-section mb-3">
+          <h5>Tags</h5>
+          <div class="tag-pills">
+            <span class="tag-pill">Quick</span>
+            <span class="tag-pill">Vegetarian</span>
+            <span class="tag-pill">Dessert</span>
+            <span class="tag-pill">High Protein</span>
+          </div>
+          <p class="muted-note mt-3 mb-0">You can replace this with dynamic tag inputs later.</p>
+        </div>
+
+        <div class="editor-section">
+          <h5>Photo Upload</h5>
+          <div class="placeholder-box mb-3">
+            Image preview will appear here
+          </div>
+          <button class="btn btn-outline-primary btn-sm w-100" type="button">
+            Choose File
+          </button>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-
-<div class="misc-container">
-
-</div>
+{% endblock %}

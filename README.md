@@ -52,7 +52,6 @@ This repo contains:
 ## Tech Stack
 - **Backend**: Python, Django
 - **Frontend**: Bootstrap 5, Django Templates, CSS
-- **Database (dev)**: SQLite
 - **Auth**: Django auth (sessions)
 
 ---

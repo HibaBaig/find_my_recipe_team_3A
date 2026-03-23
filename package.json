@@ -1,0 +1,23 @@
+{
+  "name": "find_my_recipe_team_3a",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HibaBaig/find_my_recipe_team_3A.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HibaBaig/find_my_recipe_team_3A/issues"
+  },
+  "homepage": "https://github.com/HibaBaig/find_my_recipe_team_3A#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.8"
+  }
+}

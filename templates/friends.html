@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Friends | Find My Recipe{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="mb-4">
+    <h1 class="section-heading">Friends</h1>
+    <p class="section-subtitle">Connect with other users, manage requests, and build your cooking circle.</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12 col-lg-5">
+      <div class="friend-card">
+        <h5 class="mb-3">Add Friend</h5>
+
+        <form method="post" action="{% url 'recipes:add_friend' %}">
+          {% csrf_token %}
+          <div class="friend-search">
+            <input class="form-control" name="username" placeholder="Enter username">
+            <button class="btn btn-primary" type="submit">Send request</button>
+          </div>
+        </form>
+
+        <p class="friend-hint">
+          Enter another user's exact username to send them a friend request.
+        </p>
+
+        <hr>
+
+        <h6 class="mb-3">Incoming Requests</h6>
+        {% for req in incoming %}
+          <div class="request-item">
+            <div class="friend-chip">
+              <span class="friend-chip-icon">
+                <i class="bi bi-person-plus"></i>
+              </span>
+              <span>@{{ req.from_user.username }}</span>
+            </div>
+
+            <form method="post" action="{% url 'recipes:accept_friend' req.id %}">
+              {% csrf_token %}
+              <button class="btn btn-success btn-sm" type="submit">Accept</button>
+            </form>
+          </div>
+        {% empty %}
+          <div class="empty-state">No incoming requests.</div>
+        {% endfor %}
+
+        <hr>
+
+        <h6 class="mb-3">Sent Requests</h6>
+        {% for req in sent_requests %}
+          <div class="friend-list-item">
+            <div class="friend-chip">
+              <span class="friend-chip-icon">
+                <i class="bi bi-hourglass-split"></i>
+              </span>
+              <span>@{{ req.to_user.username }}</span>
+            </div>
+            <span class="item-meta">Pending</span>
+          </div>
+        {% empty %}
+          <div class="empty-state">No sent requests.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-7">
+      <div class="friend-card">
+        <h5 class="mb-3">My Friends</h5>
+
+        {% for u in friends_list %}
+          <div class="friend-list-item">
+            <div class="friend-chip">
+              <span class="friend-chip-icon">
+                <i class="bi bi-person-fill"></i>
+              </span>
+              <span>@{{ u.username }}</span>
+            </div>
+            <span class="item-meta">Friend</span>
+          </div>
+        {% empty %}
+          <div class="empty-state">No friends yet.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

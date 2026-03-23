@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Home | Find My Recipe{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="mb-4">
+    <h1 class="section-heading">Explore Recipes</h1>
+    <p class="section-subtitle">Discover trending dishes, search ingredients, and get inspired by your next meal.</p>
+  </div>
+
+  <div class="wireframe-shell">
+    <div class="row g-3 align-items-center mb-3">
+      <div class="col-12 col-md-2">
+        <div class="wf-box wf-logo-box">Find My Recipe</div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <form method="get" action="{% url 'recipes:search' %}" class="wf-box wf-search-wrap">
+          <input class="form-control wf-search" name="q" placeholder="Search recipes / ingredients..." value="{{ request.GET.q|default:'' }}">
+        </form>
+      </div>
+
+      <div class="col-6 col-md-2">
+        <a href="{% url 'recipes:surprise_me' %}" class="wf-box text-decoration-none text-dark">
+          Surprise Me
+        </a>
+      </div>
+
+      <div class="col-6 col-md-2">
+        {% if user.is_authenticated %}
+          <a href="{% url 'recipes:profile' %}" class="wf-box text-decoration-none text-dark">
+            My Profile
+          </a>
+        {% else %}
+          <a href="{% url 'login' %}" class="wf-box text-decoration-none text-dark">
+            Login / Profile
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <aside class="col-12 col-lg-3">
+        <div class="wf-panel h-100">
+          <div class="wf-panel-title">Filters</div>
+          <div class="wf-panel-body">
+            <ul class="wf-bullets">
+              <li>Dietary: Vegan / GF / Halal</li>
+              <li>Time: &lt;15 / &lt;30 mins</li>
+              <li>Tags: Quick / High-protein / Dessert</li>
+              <li>Rating: 4+</li>
+              <li>Sort: New / Top</li>
+            </ul>
+            <div class="text-muted small mt-3">
+              This section is currently a visual placeholder. Search and Surprise Me are functional.
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="col-12 col-lg-9">
+        <div class="wf-section-title d-flex justify-content-between align-items-center">
+          <span>Featured / Trending</span>
+
+          {% if user.is_authenticated %}
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'recipes:recipe_create' %}">
+              + Add Recipe
+            </a>
+          {% else %}
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'login' %}?next={% url 'recipes:recipe_create' %}">
+              + Add Recipe
+            </a>
+          {% endif %}
+        </div>
+
+        <div class="row g-3">
+          {% for recipe in recipes %}
+            <div class="col-12 col-md-6 col-xl-4">
+              <a class="text-decoration-none" href="{% url 'recipes:recipe_detail' recipe.id %}">
+                <div class="wf-card h-100">
+                  <div class="wf-card-label">Recipe</div>
+
+                  <div class="wf-card-img">
+                    {% if recipe.image %}
+                      <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                    {% else %}
+                      <div class="wf-img-placeholder">No image uploaded</div>
+                    {% endif %}
+                  </div>
+
+                  <div class="wf-card-body">
+                    <div class="wf-title text-dark">{{ recipe.title }}</div>
+
+                    <div class="wf-meta">
+                      <span class="wf-star"><i class="bi bi-star-fill"></i></span>
+                      <span class="me-2">{{ recipe.avg_rating|default:"rating" }}</span>
+
+                      <span class="wf-clock"><i class="bi bi-clock"></i></span>
+                      <span>{{ recipe.total_time_minutes|default:"time" }} min</span>
+                    </div>
+
+                    <div class="wf-tags">
+                      {% for t in recipe.tags.all|slice:":3" %}
+                        <span class="badge text-bg-light border">{{ t.name }}</span>
+                      {% empty %}
+                        <span class="text-muted">No tags yet</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          {% empty %}
+            {% for i in "123456" %}
+              <div class="col-12 col-md-6 col-xl-4">
+                <div class="wf-card h-100">
+                  <div class="wf-card-label">Recipe Card {{ forloop.counter }}</div>
+
+                  <div class="wf-card-img">
+                    <div class="wf-img-placeholder">Image preview</div>
+                  </div>
+
+                  <div class="wf-card-body">
+                    <div class="wf-title">Recipe Title</div>
+
+                    <div class="wf-meta">
+                      <span class="wf-star"><i class="bi bi-star-fill"></i></span>
+                      <span class="me-2">4.8</span>
+
+                      <span class="wf-clock"><i class="bi bi-clock"></i></span>
+                      <span>25 min</span>
+                    </div>
+
+                    <div class="wf-tags">
+                      <span class="badge text-bg-light border">Quick</span>
+                      <span class="badge text-bg-light border">Healthy</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}

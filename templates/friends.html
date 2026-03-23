@@ -3,40 +3,66 @@
 
 {% block content %}
 <div class="container">
-  <h4 class="mb-3">Friends</h4>
+  <div class="mb-4">
+    <h1 class="section-heading">Friends</h1>
+    <p class="section-subtitle">Connect with other users, manage requests, and build your cooking circle.</p>
+  </div>
 
   <div class="row g-4">
     <div class="col-12 col-lg-5">
-      <div class="card p-3">
-        <h5>Add friend</h5>
+      <div class="friend-card">
+        <h5 class="mb-3">Add Friend</h5>
+
         <form method="post" action="{% url 'recipes:add_friend' %}">
           {% csrf_token %}
-          <div class="input-group">
+          <div class="friend-search">
             <input class="form-control" name="username" placeholder="Enter username">
             <button class="btn btn-primary" type="submit">Send request</button>
           </div>
         </form>
 
+        <p class="friend-hint">
+          Search for another user's username and send them a friend request.
+        </p>
+
         <hr>
-        <h6>Incoming requests</h6>
+
+        <h6 class="mb-3">Incoming Requests</h6>
         {% for req in incoming %}
-          <div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2">
-            <span>@{{ req.from_user.username }}</span>
-            <a class="btn btn-success btn-sm" href="{% url 'recipes:accept_friend' req.id %}">Accept</a>
+          <div class="request-item">
+            <div class="friend-chip">
+              <span class="friend-chip-icon">
+                <i class="bi bi-person-plus"></i>
+              </span>
+              <span>@{{ req.from_user.username }}</span>
+            </div>
+
+            <a class="btn btn-success btn-sm" href="{% url 'recipes:accept_friend' req.id %}">
+              Accept
+            </a>
           </div>
         {% empty %}
-          <div class="text-muted">No incoming requests.</div>
+          <div class="empty-state">No incoming requests.</div>
         {% endfor %}
       </div>
     </div>
 
     <div class="col-12 col-lg-7">
-      <div class="card p-3">
-        <h5>My friends</h5>
+      <div class="friend-card">
+        <h5 class="mb-3">My Friends</h5>
+
         {% for u in friends_list %}
-          <div class="border rounded p-2 mb-2">@{{ u.username }}</div>
+          <div class="friend-list-item">
+            <div class="friend-chip">
+              <span class="friend-chip-icon">
+                <i class="bi bi-person-fill"></i>
+              </span>
+              <span>@{{ u.username }}</span>
+            </div>
+            <span class="item-meta">Friend</span>
+          </div>
         {% empty %}
-          <div class="text-muted">No friends yet.</div>
+          <div class="empty-state">No friends yet.</div>
         {% endfor %}
       </div>
     </div>

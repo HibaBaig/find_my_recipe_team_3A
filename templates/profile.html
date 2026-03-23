@@ -3,50 +3,118 @@
 
 {% block content %}
 <div class="container">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0">My Profile</h4>
-    <a class="btn btn-outline-primary btn-sm" href="{% url 'recipes:recipe_create' %}">+ Add Recipe</a>
+  <div class="profile-hero">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+      <div class="profile-summary">
+        <div class="profile-avatar">
+          {% if user.profile.avatar %}
+            <img
+              src="{{ user.profile.avatar.url }}"
+              alt="{{ user.username }} avatar"
+              style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"
+            >
+          {% else %}
+            {{ user.username|first|upper }}
+          {% endif %}
+        </div>
+        <div>
+          <h1 class="section-heading mb-1">My Profile</h1>
+          <p class="section-subtitle">Manage your account, saved recipes, and the recipes you have shared.</p>
+        </div>
+      </div>
+
+      <a class="btn btn-primary btn-sm" href="{% url 'recipes:recipe_create' %}">
+        + Add Recipe
+      </a>
+    </div>
   </div>
 
   <div class="row g-4">
     <div class="col-12 col-lg-5">
-      <div class="card p-3">
-        <h5>Account</h5>
-        <div class="text-muted small mb-2">Logged in as <strong>{{ user.username }}</strong></div>
-        <form method="post" enctype="multipart/form-data">
+      <div class="panel-card">
+        <h5>Account Details</h5>
+        <div class="text-muted small mb-3">
+          Logged in as <strong>{{ user.username }}</strong>
+        </div>
+
+        {% if user.profile.avatar %}
+          <div class="mb-3">
+            <div class="small text-muted mb-2">Current avatar</div>
+            <img
+              src="{{ user.profile.avatar.url }}"
+              alt="{{ user.username }} avatar"
+              style="width: 96px; height: 96px; object-fit: cover; border-radius: 50%; border: 1px solid #d9e2d6;"
+            >
+          </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="profile-form">
           {% csrf_token %}
-          {{ pform.as_p }}
-          <button class="btn btn-primary btn-sm" type="submit">Update Profile</button>
+
+          <div class="form-group">
+            <label for="{{ pform.avatar.id_for_label }}">Change:</label>
+            {{ pform.avatar }}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ pform.bio.id_for_label }}">Bio:</label>
+            {{ pform.bio }}
+          </div>
+
+          <div class="form-group">
+            <label>Dietary preferences:</label>
+            <div class="checkbox-group">
+              {% for checkbox in pform.dietary_preferences %}
+                <label class="checkbox-item">
+                  {{ checkbox.tag }}
+                  <span>{{ checkbox.choice_label }}</span>
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-sm mt-2" type="submit">Update Profile</button>
         </form>
       </div>
     </div>
 
     <div class="col-12 col-lg-7">
-      <div class="card p-3 mb-3">
+      <div class="list-card mb-4">
         <h5>Saved Recipes</h5>
+
         {% for s in saved %}
-          <div class="d-flex justify-content-between border rounded p-2 mb-2">
-            <a class="text-decoration-none" href="{% url 'recipes:recipe_detail' s.recipe.id %}">{{ s.recipe.title }}</a>
-            <span class="text-muted small">{{ s.created_at|date:"M d" }}</span>
+          <div class="recipe-list-item">
+            <div>
+              <a class="item-title text-decoration-none" href="{% url 'recipes:recipe_detail' s.recipe.id %}">
+                {{ s.recipe.title }}
+              </a>
+              <div class="item-meta">Saved recipe</div>
+            </div>
+            <span class="item-meta">{{ s.created_at|date:"M d" }}</span>
           </div>
         {% empty %}
-          <div class="text-muted">No saved recipes yet.</div>
+          <div class="empty-state">No saved recipes yet.</div>
         {% endfor %}
       </div>
 
-      <div class="card p-3">
+      <div class="list-card">
         <h5>My Recipes</h5>
+
         {% for r in my_recipes %}
-          <div class="d-flex justify-content-between border rounded p-2 mb-2">
-            <a class="text-decoration-none" href="{% url 'recipes:recipe_detail' r.id %}">{{ r.title }}</a>
-            <span class="text-muted small">{{ r.created_at|date:"M d" }}</span>
+          <div class="recipe-list-item">
+            <div>
+              <a class="item-title text-decoration-none" href="{% url 'recipes:recipe_detail' r.id %}">
+                {{ r.title }}
+              </a>
+              <div class="item-meta">Recipe created by you</div>
+            </div>
+            <span class="item-meta">{{ r.created_at|date:"M d" }}</span>
           </div>
         {% empty %}
-          <div class="text-muted">You haven't created any recipes yet.</div>
+          <div class="empty-state">You haven't created any recipes yet.</div>
         {% endfor %}
       </div>
     </div>
   </div>
 </div>
 {% endblock %}
-

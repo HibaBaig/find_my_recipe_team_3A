@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.db.models import Avg
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -53,6 +54,15 @@ class Recipe(models.Model):
         through="RecipeIngredient",
         related_name="recipes"
     )
+
+    @property
+    def total_time_minutes(self):
+        return (self.prep_time_minutes or 0) + (self.cook_time_minutes or 0)
+
+    @property
+    def avg_rating(self):
+        avg = self.comments.aggregate(avg=Avg("rating"))["avg"]
+        return round(avg, 1) if avg is not None else None
 
     def __str__(self):
         return self.title

@@ -7,7 +7,15 @@
     <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
       <div class="profile-summary">
         <div class="profile-avatar">
-          {{ user.username|first|upper }}
+          {% if user.profile.avatar %}
+            <img
+              src="{{ user.profile.avatar.url }}"
+              alt="{{ user.username }} avatar"
+              style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"
+            >
+          {% else %}
+            {{ user.username|first|upper }}
+          {% endif %}
         </div>
         <div>
           <h1 class="section-heading mb-1">My Profile</h1>
@@ -28,6 +36,17 @@
         <div class="text-muted small mb-3">
           Logged in as <strong>{{ user.username }}</strong>
         </div>
+
+        {% if user.profile.avatar %}
+          <div class="mb-3">
+            <div class="small text-muted mb-2">Current avatar</div>
+            <img
+              src="{{ user.profile.avatar.url }}"
+              alt="{{ user.username }} avatar"
+              style="width: 96px; height: 96px; object-fit: cover; border-radius: 50%; border: 1px solid #d9e2d6;"
+            >
+          </div>
+        {% endif %}
 
         <form method="post" enctype="multipart/form-data" class="profile-form">
           {% csrf_token %}

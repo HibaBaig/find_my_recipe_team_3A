@@ -415,7 +415,7 @@ body{
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: 12px 14px;
-    background: #fff;
+    background: #f8f1f1;
 }
 
 .profile-form textarea {

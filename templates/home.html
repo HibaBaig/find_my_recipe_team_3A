@@ -43,18 +43,92 @@
       <div class="col-lg-3">
         <div class="filter-panel">
           <h5>Filters</h5>
-          <ul class="filter-list">
-            <li>Dietary: Vegan / GF / Halal</li>
-            <li>Time -> less than 15 mins / less than 30 mins</li>
-            <li>Tags: Quick / High-protein / Dessert</li>
-            <li>Rating: 4+</li>
-            <li>Sort: New / Top</li>
-        </ul>
-        <div class="filter-note">
-        
+
+          <form method="get">
+            <ul class="filter-list">
+              {% if dietary_tags %}
+                <li class="d-block">
+                  <div class="fw-semibold mb-2">Dietary</div>
+                  {% for tag in dietary_tags %}
+                    <div class="form-check mb-1">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="diet"
+                        value="{{ tag.slug }}"
+                        id="diet-{{ tag.slug }}"
+                        {% if tag.slug in selected_diets %}checked{% endif %}
+                      >
+                      <label class="form-check-label" for="diet-{{ tag.slug }}">{{ tag.name }}</label>
+                    </div>
+                  {% endfor %}
+                </li>
+              {% endif %}
+
+              <li class="d-block">
+                <label class="fw-semibold mb-2 d-block" for="max-time">Time</label>
+                <select class="form-select" id="max-time" name="max_time">
+                  <option value="">Any time</option>
+                  <option value="15" {% if selected_max_time == "15" %}selected{% endif %}>Less than 15 mins</option>
+                  <option value="30" {% if selected_max_time == "30" %}selected{% endif %}>Less than 30 mins</option>
+                </select>
+              </li>
+
+              {% if feature_tags %}
+                <li class="d-block">
+                  <div class="fw-semibold mb-2">Tags</div>
+                  {% for tag in feature_tags|slice:":8" %}
+                    <div class="form-check mb-1">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="tag"
+                        value="{{ tag.slug }}"
+                        id="tag-{{ tag.slug }}"
+                        {% if tag.slug in selected_tags %}checked{% endif %}
+                      >
+                      <label class="form-check-label" for="tag-{{ tag.slug }}">{{ tag.name }}</label>
+                    </div>
+                  {% endfor %}
+                </li>
+              {% endif %}
+
+              <li class="d-block">
+                <div class="fw-semibold mb-2">Rating</div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="min_rating"
+                    value="4"
+                    id="rating-4"
+                    {% if selected_min_rating %}checked{% endif %}
+                  >
+                  <label class="form-check-label" for="rating-4">4+ stars</label>
+                </div>
+              </li>
+
+              <li class="d-block">
+                <label class="fw-semibold mb-2 d-block" for="sort-order">Sort</label>
+                <select class="form-select" id="sort-order" name="sort">
+                  <option value="new" {% if selected_sort == "new" %}selected{% endif %}>New</option>
+                  <option value="top" {% if selected_sort == "top" %}selected{% endif %}>Top</option>
+                  <option value="time" {% if selected_sort == "time" %}selected{% endif %}>Fastest</option>
+                </select>
+              </li>
+            </ul>
+
+            <div class="d-flex gap-2 mt-3 flex-wrap">
+              <button class="btn btn-primary btn-sm" type="submit">Apply</button>
+              <a class="btn btn-outline-secondary btn-sm" href="{% url 'recipes:home' %}">Clear</a>
+            </div>
+          </form>
+
+          <div class="filter-note">
+            Use these filters to narrow down the featured recipes without changing the page layout.
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
       <section class="col-12 col-lg-9">
         <div class="wf-section-title d-flex justify-content-between align-items-center">
@@ -109,34 +183,14 @@
               </a>
             </div>
           {% empty %}
-            {% for i in "123456" %}
-              <div class="col-12 col-md-6 col-xl-4">
-                <div class="wf-card h-100">
-                  <div class="wf-card-label">Recipe Card {{ forloop.counter }}</div>
-
-                  <div class="wf-card-img">
-                    <div class="wf-img-placeholder">Image preview</div>
-                  </div>
-
-                  <div class="wf-card-body">
-                    <div class="wf-title">Recipe Title</div>
-
-                    <div class="wf-meta">
-                      <span class="wf-star"><i class="bi bi-star-fill"></i></span>
-                      <span class="me-2">4.8</span>
-
-                      <span class="wf-clock"><i class="bi bi-clock"></i></span>
-                      <span>25 min</span>
-                    </div>
-
-                    <div class="wf-tags">
-                      <span class="badge text-bg-light border">Quick</span>
-                      <span class="badge text-bg-light border">Healthy</span>
-                    </div>
-                  </div>
+            <div class="col-12">
+              <div class="wf-card h-100">
+                <div class="wf-card-body">
+                  <div class="wf-title">No recipes match those filters yet.</div>
+                  <div class="text-muted">Try clearing one or two filters to see more recipes.</div>
                 </div>
               </div>
-            {% endfor %}
+            </div>
           {% endfor %}
         </div>
       </section>

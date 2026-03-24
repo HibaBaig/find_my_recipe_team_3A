@@ -115,9 +115,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = '/static/'              # add leading slash
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'recipes' / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # for collectstatic output
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media files (uploaded images)
 MEDIA_URL = '/media/'

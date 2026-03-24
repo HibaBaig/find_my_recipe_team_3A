@@ -2,45 +2,123 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Avg, F, IntegerField, Q, ExpressionWrapper
 from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
-from .forms import RecipeForm, ProfileForm, CommentForm, SignUpForm
-from .models import Recipe, Ingredient, RecipeIngredient, SavedRecipe, Friendship, Profile, Tag
+from .forms import CommentForm, ProfileForm, RecipeForm, SignUpForm
+from .models import Friendship, Ingredient, Profile, Recipe, RecipeIngredient, SavedRecipe, Tag
+
+DIETARY_KEYWORDS = (
+    "vegan",
+    "vegetarian",
+    "gf",
+    "gluten-free",
+    "gluten free",
+    "halal",
+    "keto",
+    "dairy-free",
+    "dairy free",
+)
+
+
+def _base_recipe_queryset():
+    return Recipe.objects.select_related("author").prefetch_related("tags", "ingredients").annotate(
+        avg_rating_value=Avg("comments__rating"),
+        total_time_value=ExpressionWrapper(
+            F("prep_time_minutes") + F("cook_time_minutes"),
+            output_field=IntegerField(),
+        ),
+    )
+
 
 
 def home(request):
-    recipes = Recipe.objects.order_by("-created_at")[:6]
-    dietary_tags = Tag.objects.order_by("name")
     selected_diets = request.GET.getlist("diet")
+    selected_tags = request.GET.getlist("tag")
+    max_time = (request.GET.get("max_time") or "").strip()
+    sort = (request.GET.get("sort") or "new").strip()
+    min_rating = request.GET.get("min_rating") == "4"
 
-    return render(request, "home.html", {
-        "recipes": recipes,
-        "dietary_tags": dietary_tags,
-        "selected_diets": selected_diets,
-    })
+    recipes = _base_recipe_queryset()
+
+    for diet_slug in selected_diets:
+        recipes = recipes.filter(tags__slug=diet_slug)
+
+    for tag_slug in selected_tags:
+        recipes = recipes.filter(tags__slug=tag_slug)
+
+    if max_time in {"15", "30"}:
+        recipes = recipes.filter(total_time_value__lte=int(max_time))
+
+    if min_rating:
+        recipes = recipes.filter(avg_rating_value__gte=4)
+
+    if sort == "top":
+        recipes = recipes.order_by("-avg_rating_value", "-created_at")
+    elif sort == "time":
+        recipes = recipes.order_by("total_time_value", "-created_at")
+    else:
+        sort = "new"
+        recipes = recipes.order_by("-created_at")
+
+    dietary_query = Q()
+    for keyword in DIETARY_KEYWORDS:
+        dietary_query |= Q(name__icontains=keyword) | Q(slug__icontains=keyword)
+
+    dietary_tags = Tag.objects.filter(dietary_query).order_by("name") if dietary_query else Tag.objects.none()
+    dietary_tag_ids = list(dietary_tags.values_list("id", flat=True))
+    feature_tags = Tag.objects.exclude(id__in=dietary_tag_ids).order_by("name")
+
+    return render(
+        request,
+        "home.html",
+        {
+            "recipes": recipes.distinct()[:6],
+            "dietary_tags": dietary_tags,
+            "feature_tags": feature_tags,
+            "selected_diets": selected_diets,
+            "selected_tags": selected_tags,
+            "selected_max_time": max_time,
+            "selected_min_rating": min_rating,
+            "selected_sort": sort,
+        },
+    )
+
 
 
 def search(request):
     q = (request.GET.get("q") or "").strip()
-    recipe_results = []
-    user_results = []
+    recipe_results = Recipe.objects.none()
+    user_results = User.objects.none()
 
     if q:
-        recipe_results = Recipe.objects.filter(
-            Q(title__icontains=q) | Q(description__icontains=q)
-        ).order_by("-created_at")[:50]
+        recipe_results = (
+            _base_recipe_queryset()
+            .filter(
+                Q(title__icontains=q)
+                | Q(description__icontains=q)
+                | Q(ingredients__name__icontains=q)
+                | Q(tags__name__icontains=q)
+                | Q(author__username__icontains=q)
+            )
+            .distinct()
+            .order_by("-created_at")[:50]
+        )
 
-        user_results = User.objects.filter(
-            username__icontains=q
-        ).order_by("username")[:50]
+        user_results = User.objects.filter(username__icontains=q).order_by("username")[:50]
 
-    return render(request, "search.html", {
-        "q": q,
-        "recipe_results": recipe_results,
-        "user_results": user_results,
-    })
+    return render(
+        request,
+        "search.html",
+        {
+            "q": q,
+            "recipe_results": recipe_results,
+            "user_results": user_results,
+        },
+    )
+
 
 
 def surprise_me(request):
@@ -54,13 +132,13 @@ def surprise_me(request):
     recipes = Recipe.objects.all().prefetch_related("ingredients", "tags")
 
     if selected_diets:
-        for ds in selected_diets:
-            recipes = recipes.filter(tags__slug=ds)
+        for diet_slug in selected_diets:
+            recipes = recipes.filter(tags__slug=diet_slug)
 
     results = []
     if have:
-        for r in recipes:
-            required = {ing.name.lower() for ing in r.ingredients.all()}
+        for recipe in recipes:
+            required = {ingredient.name.lower() for ingredient in recipe.ingredients.all()}
             if not required:
                 continue
 
@@ -68,20 +146,27 @@ def surprise_me(request):
             score = len(matched) / float(len(required))
             missing = sorted(list(required - have))
 
-            results.append({
-                "recipe": r,
-                "match_percent": int(round(score * 100)),
-                "missing": missing[:8],
-            })
+            results.append(
+                {
+                    "recipe": recipe,
+                    "match_percent": int(round(score * 100)),
+                    "missing": missing[:8],
+                }
+            )
 
-        results.sort(key=lambda x: x["match_percent"], reverse=True)
+        results.sort(key=lambda item: item["match_percent"], reverse=True)
 
-    return render(request, "surprise_me.html", {
-        "ingredient_str": ingredient_str,
-        "selected_diets": selected_diets,
-        "dietary_tags": Tag.objects.order_by("name"),
-        "results": results[:10],
-    })
+    return render(
+        request,
+        "surprise_me.html",
+        {
+            "ingredient_str": ingredient_str,
+            "selected_diets": selected_diets,
+            "dietary_tags": Tag.objects.order_by("name"),
+            "results": results[:10],
+        },
+    )
+
 
 
 def signup(request):
@@ -100,6 +185,7 @@ def signup(request):
     return render(request, "registration/signup.html", {"form": form})
 
 
+
 def recipe_detail(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
     ingredients = RecipeIngredient.objects.filter(recipe=recipe).select_related("ingredient")
@@ -108,31 +194,32 @@ def recipe_detail(request, recipe_id):
     if request.user.is_authenticated:
         saved = SavedRecipe.objects.filter(user=request.user, recipe=recipe).exists()
 
-    cform = None
-
     if request.method == "POST":
         if not request.user.is_authenticated:
             return redirect("login")
 
-        cform = CommentForm(request.POST)
-
-        if cform.is_valid():
-            c = cform.save(commit=False)
-            c.user = request.user
-            c.recipe = recipe
-            c.save()
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.user = request.user
+            comment.recipe = recipe
+            comment.save()
 
             messages.success(request, "Comment posted.")
             return redirect("recipes:recipe_detail", recipe_id=recipe.id)
     else:
-        cform = CommentForm()
+        comment_form = CommentForm()
 
-    return render(request, "recipe_detail.html", {
-        "recipe": recipe,
-        "ingredients": ingredients,
-        "saved": saved,
-        "comment_form": cform,
-    })
+    return render(
+        request,
+        "recipe_detail.html",
+        {
+            "recipe": recipe,
+            "ingredients": ingredients,
+            "saved": saved,
+            "comment_form": comment_form,
+        },
+    )
 
 
 @login_required
@@ -141,19 +228,21 @@ def toggle_save(request, recipe_id):
         return JsonResponse({"error": "POST required"}, status=405)
 
     recipe = get_object_or_404(Recipe, id=recipe_id)
-    obj = SavedRecipe.objects.filter(user=request.user, recipe=recipe)
+    saved_qs = SavedRecipe.objects.filter(user=request.user, recipe=recipe)
 
-    if obj.exists():
-        obj.delete()
+    if saved_qs.exists():
+        saved_qs.delete()
         saved = False
     else:
         SavedRecipe.objects.create(user=request.user, recipe=recipe)
         saved = True
 
-    return JsonResponse({
-        "saved": saved,
-        "save_count": SavedRecipe.objects.filter(recipe=recipe).count(),
-    })
+    return JsonResponse(
+        {
+            "saved": saved,
+            "save_count": SavedRecipe.objects.filter(recipe=recipe).count(),
+        }
+    )
 
 
 @login_required
@@ -174,12 +263,16 @@ def recipe_create(request):
     else:
         form = RecipeForm()
 
-    return render(request, "add_recipe.html", {
-        "mode": "create",
-        "form": form,
-        "recipe": None,
-        "rows": [1, 2, 3, 4, 5],
-    })
+    return render(
+        request,
+        "add_recipe.html",
+        {
+            "mode": "create",
+            "form": form,
+            "recipe": None,
+            "rows": [1, 2, 3, 4, 5],
+        },
+    )
 
 
 @login_required
@@ -205,13 +298,17 @@ def recipe_edit(request, recipe_id):
 
     existing = RecipeIngredient.objects.filter(recipe=recipe).select_related("ingredient")
 
-    return render(request, "add_recipe.html", {
-        "mode": "edit",
-        "form": form,
-        "recipe": recipe,
-        "existing": existing,
-        "rows": [1, 2, 3, 4, 5],
-    })
+    return render(
+        request,
+        "add_recipe.html",
+        {
+            "mode": "edit",
+            "form": form,
+            "recipe": recipe,
+            "existing": existing,
+            "rows": [1, 2, 3, 4, 5],
+        },
+    )
 
 
 @login_required
@@ -234,73 +331,63 @@ def profile(request):
     profile_obj, _ = Profile.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
-        pform = ProfileForm(request.POST, request.FILES, instance=profile_obj)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=profile_obj)
 
-        if pform.is_valid():
-            pform.save()
+        if profile_form.is_valid():
+            profile_form.save()
             messages.success(request, "Profile updated.")
             return redirect("recipes:profile")
     else:
-        pform = ProfileForm(instance=profile_obj)
+        profile_form = ProfileForm(instance=profile_obj)
 
     my_recipes = Recipe.objects.filter(author=request.user).order_by("-created_at")
     saved = SavedRecipe.objects.filter(user=request.user).select_related("recipe").order_by("-created_at")
 
-    return render(request, "profile.html", {
-        "pform": pform,
-        "my_recipes": my_recipes,
-        "saved": saved,
-    })
-
-
-from django.contrib import messages
-from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.db.models import Q
-from django.http import HttpResponseForbidden, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_POST
-
-from .forms import RecipeForm, ProfileForm, CommentForm, SignUpForm
-from .models import Recipe, Ingredient, RecipeIngredient, SavedRecipe, Friendship, Profile, Tag
+    return render(
+        request,
+        "profile.html",
+        {
+            "pform": profile_form,
+            "my_recipes": my_recipes,
+            "saved": saved,
+        },
+    )
 
 
 @login_required
 def friends(request):
     incoming = Friendship.objects.filter(
         to_user=request.user,
-        status=Friendship.PENDING
+        status=Friendship.PENDING,
     ).select_related("from_user")
 
     sent_requests = Friendship.objects.filter(
         from_user=request.user,
-        status=Friendship.PENDING
+        status=Friendship.PENDING,
     ).select_related("to_user")
 
     accepted_out = Friendship.objects.filter(
         from_user=request.user,
-        status=Friendship.ACCEPTED
+        status=Friendship.ACCEPTED,
     ).select_related("to_user")
 
     accepted_in = Friendship.objects.filter(
         to_user=request.user,
-        status=Friendship.ACCEPTED
+        status=Friendship.ACCEPTED,
     ).select_related("from_user")
 
-    friends_list = []
+    friends_list = [friendship.to_user for friendship in accepted_out]
+    friends_list.extend(friendship.from_user for friendship in accepted_in)
 
-    for f in accepted_out:
-        friends_list.append(f.to_user)
-
-    for f in accepted_in:
-        friends_list.append(f.from_user)
-
-    return render(request, "friends.html", {
-        "incoming": incoming,
-        "sent_requests": sent_requests,
-        "friends_list": friends_list,
-    })
+    return render(
+        request,
+        "friends.html",
+        {
+            "incoming": incoming,
+            "sent_requests": sent_requests,
+            "friends_list": friends_list,
+        },
+    )
 
 
 @login_required
@@ -322,24 +409,19 @@ def add_friend(request):
         messages.error(request, f"No user found with username '{username}'.")
         return redirect("recipes:friends")
 
-    
     already_friends = Friendship.objects.filter(
-        (
-            Q(from_user=request.user, to_user=to_user) |
-            Q(from_user=to_user, to_user=request.user)
-        ),
-        status=Friendship.ACCEPTED
+        (Q(from_user=request.user, to_user=to_user) | Q(from_user=to_user, to_user=request.user)),
+        status=Friendship.ACCEPTED,
     ).exists()
 
     if already_friends:
         messages.info(request, f"You are already friends with {to_user.username}.")
         return redirect("recipes:friends")
 
-    
     reverse_request = Friendship.objects.filter(
         from_user=to_user,
         to_user=request.user,
-        status=Friendship.PENDING
+        status=Friendship.PENDING,
     ).first()
 
     if reverse_request:
@@ -348,11 +430,10 @@ def add_friend(request):
         messages.success(request, f"You are now friends with {to_user.username}.")
         return redirect("recipes:friends")
 
-    
     existing_request = Friendship.objects.filter(
         from_user=request.user,
         to_user=to_user,
-        status=Friendship.PENDING
+        status=Friendship.PENDING,
     ).first()
 
     if existing_request:
@@ -362,7 +443,7 @@ def add_friend(request):
     Friendship.objects.create(
         from_user=request.user,
         to_user=to_user,
-        status=Friendship.PENDING
+        status=Friendship.PENDING,
     )
     messages.success(request, f"Friend request sent to {to_user.username}.")
     return redirect("recipes:friends")
@@ -371,29 +452,19 @@ def add_friend(request):
 @login_required
 @require_POST
 def accept_friend(request, req_id):
-    fr = get_object_or_404(
+    friendship = get_object_or_404(
         Friendship,
         id=req_id,
         to_user=request.user,
-        status=Friendship.PENDING
+        status=Friendship.PENDING,
     )
 
-    fr.status = Friendship.ACCEPTED
-    fr.save()
+    friendship.status = Friendship.ACCEPTED
+    friendship.save()
 
-    messages.success(request, f"You are now friends with {fr.from_user.username}.")
+    messages.success(request, f"You are now friends with {friendship.from_user.username}.")
     return redirect("recipes:friends")
 
-
-@login_required
-def accept_friend(request, req_id):
-    fr = get_object_or_404(Friendship, id=req_id, to_user=request.user)
-
-    fr.status = Friendship.ACCEPTED
-    fr.save()
-
-    messages.success(request, f"You are now friends with {fr.from_user.username}.")
-    return redirect("recipes:friends")
 
 
 def _save_ingredient_rows(request, recipe):
@@ -405,11 +476,11 @@ def _save_ingredient_rows(request, recipe):
         if not name:
             continue
 
-        ing, _ = Ingredient.objects.get_or_create(name=name)
+        ingredient, _ = Ingredient.objects.get_or_create(name=name)
 
         RecipeIngredient.objects.create(
             recipe=recipe,
-            ingredient=ing,
+            ingredient=ingredient,
             quantity=qty,
-            unit=unit
+            unit=unit,
         )

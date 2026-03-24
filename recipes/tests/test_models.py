@@ -9,14 +9,11 @@ User = get_user_model()
 
 class TestModels(TestCase):
     def setUp(self):
-        # user
         self.user = User.objects.create_user(username="testuser", password="testpassword")
 
-        # ingredient
         self.ingredient = Ingredient.objects.create(name="name")
         self.ingredient.full_clean()
 
-        # recipe
         self.recipe = Recipe.objects.create(
             author=self.user,
             title="title",
@@ -26,7 +23,6 @@ class TestModels(TestCase):
         )
         self.recipe.full_clean()
 
-        # recipe ingredient
         self.recipeingredient = RecipeIngredient.objects.create(
             recipe=self.recipe,
             ingredient=self.ingredient,
@@ -59,20 +55,15 @@ class TestModels(TestCase):
         self.assertFalse(exists)
 
     def test_saved_recipe_creation(self):
-        saved_recipe = SavedRecipe(
-            user=self.user, recipe=self.recipe, created_at=timezone.now()
-        )
-        saved_recipe.full_clean()
-        self.assertEqual(saved_recipe.user, self.user)
-        self.assertEqual(saved_recipe.recipe, self.recipe)
-        self.assertIsInstance(saved_recipe.created_at, timezone.datetime)
+        saved = SavedRecipe(user=self.user, recipe=self.recipe, created_at=timezone.now())
+        saved.full_clean()
+        self.assertEqual(saved.user, self.user)
+        self.assertEqual(saved.recipe, self.recipe)
+        self.assertIsInstance(saved.created_at, timezone.datetime)
 
     def test_comment_creation(self):
         comment = Comment(
-            recipe=self.recipe,
-            user=self.user,
-            text="text",
-            created_at=timezone.now(),
+            recipe=self.recipe, user=self.user, text="text", created_at=timezone.now()
         )
         comment.full_clean()
         self.assertEqual(comment.recipe, self.recipe)

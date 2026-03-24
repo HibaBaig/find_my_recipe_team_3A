@@ -338,7 +338,12 @@ def profile(request):
     return render(
         request,
         "profile.html",
-        {"pform": profile_form, "my_recipes": my_recipes, "saved": saved},
+        {
+            "profile": profile_obj,
+            "pform": profile_form,
+            "my_recipes": my_recipes,
+            "saved": saved,
+        },
     )
 
 

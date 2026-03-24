@@ -1,6 +1,9 @@
 from django.test import TestCase
 from recipes.models import Ingredient, Recipe, SavedRecipe, Friendship
 from django.contrib.auth import get_user_model
+from django.urls import reverse
+from recipes.models import Recipe
+
 User = get_user_model()
 
 
@@ -183,3 +186,16 @@ class TestViews(TestCase):
 
         friendship.refresh_from_db()
         self.assertEqual(friendship.status, Friendship.ACCEPTED)
+        from django.test import TestCase, Client
+
+
+    def setUp(self):
+        Recipe.objects.create(title="Veggie Chili", description="Beans and veggies")
+        Recipe.objects.create(title="Garlic Chicken Rice", description="Garlicky chicken with rice")
+
+    def test_search_returns_matches(self):
+        client = Client()
+        resp = client.get(reverse("recipes:search"), {"q": "garlic"})  # adjust url name if needed
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Garlic Chicken Rice")
+        self.assertNotContains(resp, "Veggie Chili")

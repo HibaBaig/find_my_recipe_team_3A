@@ -3,11 +3,9 @@ from django.urls import reverse
 
 class SmokeTests(TestCase):
     def test_healthcheck(self):
-        # basic sanity to prove test runner works
         self.assertTrue(True)
 
     def test_home_page_loads(self):
         client = Client()
-        url = reverse("recipes:home")  # adjust if your url name differs
-        resp = client.get(url)
+        resp = client.get(reverse("recipes:home"))  # adjust url name if different
         self.assertEqual(resp.status_code, 200)

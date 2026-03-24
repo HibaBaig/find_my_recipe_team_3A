@@ -1,8 +1,10 @@
 from django.test import TestCase
 from django.utils import timezone
 
+from recipes.models import Recipe
 from recipes.models import Ingredient, Recipe, RecipeIngredient, SavedRecipe, Comment, Friendship
 from recipes.tests.test_views import User
+
 
 class TestModels(TestCase):
 
@@ -81,7 +83,7 @@ class TestModels(TestCase):
         self.assertEqual(friendship.status, "pending")
         self.assertIsInstance(friendship.created_at, timezone.datetime)
 
-        
+
     def test_str_returns_title(self):
         recipe = Recipe.objects.create(title="Paneer Tikka", description="Spiced paneer")
         self.assertEqual(str(recipe), "Paneer Tikka")

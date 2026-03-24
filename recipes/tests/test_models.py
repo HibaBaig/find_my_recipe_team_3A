@@ -57,8 +57,10 @@ class TestModels(TestCase):
     def test_saved_recipe_creation(self):
         saved = SavedRecipe(user=self.user, recipe=self.recipe, created_at=timezone.now())
         saved.full_clean()
+        
         self.assertEqual(saved.user, self.user)
         self.assertEqual(saved.recipe, self.recipe)
+
         self.assertIsInstance(saved.created_at, timezone.datetime)
 
     def test_comment_creation(self):

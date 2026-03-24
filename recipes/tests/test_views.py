@@ -285,6 +285,7 @@ class TestViews(TestCase):
             to_user=self.user,
             status=Friendship.PENDING,
         )
+
         response = self.client.post(f"/friends/accept/{friendship.id}/")
         self.assertEqual(response.status_code, 302)
         friendship.refresh_from_db()
@@ -296,5 +297,6 @@ class TestViews(TestCase):
             to_user=self.user,
             status=Friendship.PENDING,
         )
+        
         response = self.client.get(f"/friends/accept/{friendship.id}/")
         self.assertEqual(response.status_code, 405)

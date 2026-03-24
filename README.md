@@ -88,14 +88,6 @@ DATABASE_URL=sqlite:///db.sqlite3   # or your Postgres URL
 ```bash
 python manage.py test
 ```
-(Add specific app/test modules here if needed.)
-
-## API (if applicable)
-Document key endpoints if you expose any:
-- `GET /api/recipes/`
-- `POST /api/recipes/`
-- `GET /api/recipes/{id}/`
-
 ## Deployment
 - Set `DEBUG=False`
 - Configure `ALLOWED_HOSTS`
@@ -109,7 +101,7 @@ Document key endpoints if you expose any:
 - DB errors: verify migrations, `DATABASE_URL`, and applied schema
 
 ## Credits
-- Team: Tejas-kaushik & collaborators
+- Team: Team 3A
 - Logo: provided by project team
 
 ## License

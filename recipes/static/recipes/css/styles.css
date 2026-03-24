@@ -49,6 +49,11 @@ a{
   color: #5f7660 !important;
   font-weight: 700;
 }
+.brand-logo{
+  height: 92px;     
+  width: auto;
+  object-fit: contain;
+}
 
 .form-control{
   border: 1px solid var(--line);

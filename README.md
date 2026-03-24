@@ -86,7 +86,7 @@ DATABASE_URL=sqlite:///db.sqlite3   # or your Postgres URL
 
 ## Testing
 ```bash
-python manage.py test
+python manage.py test recipes
 ```
 ## Deployment
 - Set `DEBUG=False`

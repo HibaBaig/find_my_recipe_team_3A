@@ -1,62 +1,116 @@
-# Team 3A 
+# Find My Recipe
 
-# Find My Recipe 🍲✨  
-*A CookBook app with “Surprise Me” recommendations, built with Django + Bootstrap.*
-
-Find My Recipe helps users **discover, create, and share recipes**, save favourites, connect with friends, and use **Surprise Me** to get recipe suggestions based on ingredients on hand + dietary preferences.
-
-This repo contains:
-- **Bootstrap frontend** implemented as **Django templates** (wireframe-matching layout)
-- **Design artifacts** (wireframes, ERD, design spec)
-- **Backend scaffold (Django)** to be integrated by the team (models/views/forms/auth)
-
----
+Discover, search, and share recipes tailored to your dietary preferences. Upload your own dishes, explore trending ideas, and find inspiration fast.
 
 ## Table of Contents
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
-- [Frontend → Backend Integration Contract](#frontend--backend-integration-contract)
-- [Local Setup (Backend)](#local-setup-backend)
-- [Run & Common Commands](#run--common-commands)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Run & Build](#run--build)
+- [Static & Media](#static--media)
 - [Testing](#testing)
-- [Conventions](#conventions)
-- [Roadmap](#roadmap)
+- [API (if applicable)](#api-if-applicable)
+- [Deployment](#deployment)
 - [Troubleshooting](#troubleshooting)
-
----
+- [Credits](#credits)
+- [License](#license)
 
 ## Features
-
-### MVP (Course Requirements)
-- **Accounts**: signup, login, logout  
-- **Profiles**: dietary preferences, saved recipes
-- **Recipes**: create, view, edit, delete (owner-only)
-- **Explore/Home**: featured/trending recipes grid + filters sidebar
-- **Search**: recipes + users
-- **Save**: bookmark recipes
-- **Comments**: comment on recipes (optional rating)
-- **Friends**: add friends, view friend list
-- **Surprise Me**: ingredient input + dietary filters → match % + missing ingredients
-
-### Surprise Me Matching (MVP Logic)
-- Convert user ingredients + recipe ingredients into sets
-- `match_score = matched / total_required`
-- Show:
-  - match percentage
-  - missing ingredients list
-- Filter out recipes that don’t satisfy selected dietary tags
-
----
+- 🔍 Search by recipe name or ingredients
+- 🧭 Filters for dietary needs (Vegan / GF / Halal, etc.)
+- ⭐ Featured & trending carousel
+- 👤 User profiles and saved recipes
+- 📸 Recipe uploads with images
+- 🎲 “Surprise Me” random pick
 
 ## Tech Stack
-- **Backend**: Python, Django
-- **Frontend**: Bootstrap 5, Django Templates, CSS
-- **Database (dev)**: SQLite
-- **Auth**: Django auth (sessions)
-
----
+- Backend: Django / Django REST Framework (if API enabled)
+- Frontend: Django templates + custom CSS (Bootstrap optional)
+- DB: SQLite (dev) — easily swap to Postgres
+- Assets: Django staticfiles
+- Auth: Django auth (extendable)
 
 ## Project Structure
+```
+find_my_recipe_team_3A/
+├─ manage.py
+├─ recipes/              # app
+│  ├─ static/recipes/    # css, js, img (logo.png)
+│  ├─ templates/         # HTML templates
+│  └─ ...
+├─ media/                # user-uploaded images (gitignored)
+└─ README.md
+```
 
-Frontend is stored in a Django-friendly structure so it can be dropped into a Django project immediately:
+## Getting Started
+```bash
+# clone and enter project
+git clone <repo-url>
+cd find_my_recipe_team_3A
+
+# create venv
+python -m venv .env
+.env\Scripts\activate   # Windows
+# or: source .env/bin/activate
+
+# install deps
+pip install -r requirements.txt
+
+# migrations & seed
+python manage.py migrate
+python manage.py loaddata initial_data.json  # if provided
+
+# run dev server
+python manage.py runserver
+```
+
+## Environment Variables
+Create a `.env` or set in your shell:
+```
+SECRET_KEY=your-secret
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+DATABASE_URL=sqlite:///db.sqlite3   # or your Postgres URL
+```
+
+## Run & Build
+- Dev server: `python manage.py runserver`
+- Collect static for prod: `python manage.py collectstatic`
+
+## Static & Media
+- Logo lives at `recipes/static/recipes/img/logo.png`
+- Custom styles in `recipes/static/recipes/css/styles.css`
+- User uploads stored in `media/` (ignored by git)
+
+## Testing
+```bash
+python manage.py test
+```
+(Add specific app/test modules here if needed.)
+
+## API (if applicable)
+Document key endpoints if you expose any:
+- `GET /api/recipes/`
+- `POST /api/recipes/`
+- `GET /api/recipes/{id}/`
+
+## Deployment
+- Set `DEBUG=False`
+- Configure `ALLOWED_HOSTS`
+- Run `collectstatic`
+- Point web server to `static/` (collected) and `media/`
+- Use a process manager (gunicorn/uvicorn) behind Nginx/Apache
+
+## Troubleshooting
+- Missing styles/logo: ensure `{% load static %}` and run `collectstatic`
+- Images not showing: check `MEDIA_URL`/`MEDIA_ROOT` and file permissions
+- DB errors: verify migrations, `DATABASE_URL`, and applied schema
+
+## Credits
+- Team: Tejas-kaushik & collaborators
+- Logo: provided by project team
+
+## License
+MIT (or your chosen license)

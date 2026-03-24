@@ -248,3 +248,11 @@ Thumbs.db
 .coverage
 htmlcov/
 .pytest_cache/
+db.sqlite3
+.venv/
+env/
+__pycache__/
+*.pyc
+.git/
+staticfiles/
+media/

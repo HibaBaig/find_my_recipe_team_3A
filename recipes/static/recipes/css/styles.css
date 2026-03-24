@@ -660,3 +660,61 @@ a{
     max-width: 1200px;
     margin: 0 auto;
 }
+/* Filter panel polish */
+.filter-panel{
+  background: linear-gradient(180deg, #f8fcf7 0%, #f1f7ef 100%);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 1.1rem 1.25rem 1.3rem;
+}
+
+.filter-panel h5{
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  color: #5f7660;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.filter-panel h5::before{
+  content: "🧭";
+  font-size: 1rem;
+}
+
+.filter-list{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.filter-list li{
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #3f4a3f;
+  font-weight: 600;
+}
+
+.filter-list li::before{
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 4px rgba(155,183,154,0.18);
+}
+
+.filter-note{
+  margin-top: 0.9rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: rgba(155,183,154,0.08);
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}

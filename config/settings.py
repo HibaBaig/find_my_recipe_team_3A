@@ -74,9 +74,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": str(BASE_DIR / "db.sqlite3"),  # cast Path to str to avoid TypeError
     }
 }
 
@@ -115,8 +115,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-# Static files (CSS, JavaScript)
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'              # add leading slash
+STATICFILES_DIRS = [BASE_DIR / 'recipes' / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # for collectstatic output
 
 # Media files (uploaded images)
 MEDIA_URL = '/media/'

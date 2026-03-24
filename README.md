@@ -11,7 +11,6 @@ Discover, search, and share recipes tailored to your dietary preferences. Upload
 - [Run & Build](#run--build)
 - [Static & Media](#static--media)
 - [Testing](#testing)
-- 
 - [Deployment](#deployment) [on python anywhere]
 - [Troubleshooting](#troubleshooting)
 - [Credits](#credits)

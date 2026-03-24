@@ -109,7 +109,7 @@ Document key endpoints if you expose any:
 - DB errors: verify migrations, `DATABASE_URL`, and applied schema
 
 ## Credits
-- Team: Tejas-kaushik & collaborators
+- Team: Team 3A
 - Logo: provided by project team
 
 ## License

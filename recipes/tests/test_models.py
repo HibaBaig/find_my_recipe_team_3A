@@ -80,3 +80,8 @@ class TestModels(TestCase):
         self.assertEqual(friendship.to_user, self.user)
         self.assertEqual(friendship.status, "pending")
         self.assertIsInstance(friendship.created_at, timezone.datetime)
+
+        
+    def test_str_returns_title(self):
+        recipe = Recipe.objects.create(title="Paneer Tikka", description="Spiced paneer")
+        self.assertEqual(str(recipe), "Paneer Tikka")

@@ -1,103 +1,118 @@
 # Find My Recipe
 
-Discover, search, and share recipes tailored to your dietary preferences. Upload your own dishes, explore trending ideas, and find inspiration fast.
+**Module:** Web Application Development 2  
+**Team:** Team 3A  
+**Repository:** [find_my_recipe_team_3A](https://github.com/HibaBaig/find_my_recipe_team_3A)
 
-## Table of Contents
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [Run & Build](#run--build)
-- [Static & Media](#static--media)
-- [Testing](#testing)
-- [Deployment](#deployment) [on python anywhere]
-- [Troubleshooting](#troubleshooting)
-- [Credits](#credits)
-- [License](#license)
+## Project Overview
 
-## Features
-- 🔍 Search by recipe name or ingredients
-- 🧭 Filters for dietary needs (Vegan / GF / Halal, etc.)
-- ⭐ Featured & trending carousel
-- 👤 User profiles and saved recipes
-- 📸 Recipe uploads with images
-- 🎲 “Surprise Me” random pick
+Find My Recipe is a Django web application that helps users discover, create, save, and share recipes.  
+The system supports recipe posting, dietary filtering, ingredient-based searching, social interaction through friends, and personalised user profiles.
+
+The project was designed to provide a clean and responsive user experience while demonstrating core Django development skills such as authentication, model relationships, template inheritance, URL routing, static/media handling, form processing, AJAX interaction, and automated testing.
+
+---
+
+## Main Features
+
+### User Accounts
+- User registration and login
+- Secure authentication using Django’s built-in auth system
+- Personal profile page with avatar, bio, and dietary preferences
+
+### Recipe Management
+- Create, edit, and delete recipes
+- Upload recipe images
+- Add cooking steps, preparation time, cooking time, servings, and ingredients
+- Assign recipes to tags such as dietary categories or feature labels
+
+### Search and Discovery
+- Search recipes by:
+  - title
+  - description
+  - ingredient name
+  - tag
+  - author username
+- Home page filtering for:
+  - dietary tags
+  - feature tags
+  - maximum cooking/preparation time
+  - minimum rating
+  - sort order
+
+### Social Features
+- Send and accept friend requests
+- View incoming requests, sent requests, and current friends
+- Save and unsave recipes for quick access in the profile page
+
+### Recipe Interaction
+- Add comments to recipes
+- Leave ratings on recipes
+- View average recipe ratings
+- “Surprise Me” feature to match recipes against ingredients entered by the user
+
+---
+
+## Implementation Highlights
+
+This project includes several features that align with common coursework marking criteria:
+
+- **Responsive CSS framework:** Bootstrap 5 is used throughout the application
+- **Template inheritance:** pages extend a shared `base.html`
+- **Relative URLs:** Django `{% url %}` tags are used in templates
+- **Separate static assets:** CSS and JavaScript are stored in static files rather than embedded inline
+- **AJAX functionality:** save/unsave recipe behaviour is handled asynchronously using JavaScript `fetch()`
+- **Automated testing:** the application includes model, smoke, and view tests
+
+---
 
 ## Tech Stack
-- Backend: Django / Django REST Framework
-- Frontend: Django templates + custom CSS (Bootstrap optional)
-- DB: SQLite (dev) — easily swap to Postgres
-- Assets: Django staticfiles
-- Auth: Django auth (extendable)
+
+- **Backend:** Django 5
+- **Language:** Python 3
+- **Database:** SQLite (development)
+- **Frontend:** Django Templates, HTML, CSS, Bootstrap 5
+- **Images:** Pillow
+- **JavaScript:** Vanilla JavaScript for AJAX interactions
+
+---
 
 ## Project Structure
-```
+
+```text
 find_my_recipe_team_3A/
-├─ manage.py
-├─ recipes/              # app
-│  ├─ static/recipes/    # css, js, img (logo.png)
-│  ├─ templates/         # HTML templates
-│  └─ ...
-├─ media/                # user-uploaded images (gitignored)
-└─ README.md
-```
-
-## Getting Started
-```bash
-# clone and enter project
-git clone <repo-url>
-cd find_my_recipe_team_3A
-
-# create venv
-python -m venv .env
-.env\Scripts\activate   # Windows
-# or: source .env/bin/activate
-
-# install deps
-pip install -r requirements.txt
-
-# migrations & seed
-python manage.py migrate
-python manage.py loaddata initial_data.json  # if provided
-
-# run dev server
-python manage.py runserver
-```
-
-## Environment Variables
-Create a `.env` or set in your shell:
-```
-SECRET_KEY=your-secret
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-DATABASE_URL=sqlite:///db.sqlite3   # or your Postgres URL
-```
-
-## Run & Build
-- Dev server: `python manage.py runserver`
-- Collect static for prod: `python manage.py collectstatic`
-
-## Static & Media
-- Logo lives at `recipes/static/recipes/img/logo.png`
-- Custom styles in `recipes/static/recipes/css/styles.css`
-- User uploads stored in `media/` (ignored by git)
-
-## Testing
-```bash
-python manage.py test recipes
-```
-## Deployment
-- Set `DEBUG=False`
-- Configure `ALLOWED_HOSTS`
-- Run `collectstatic`
-- Point web server to `static/` (collected) and `media/`
-- Use a process manager (gunicorn/uvicorn) behind Nginx/Apache
-
-## Troubleshooting
-- Missing styles/logo: ensure `{% load static %}` and run `collectstatic`
-- Images not showing: check `MEDIA_URL`/`MEDIA_ROOT` and file permissions
-- DB errors: verify migrations, `DATABASE_URL`, and applied schema
-
-## Credits
-- Team: Team 3A
+├── manage.py
+├── requirements.txt
+├── population_script.py
+├── recipes/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── urls.py
+│   ├── views.py
+│   ├── migrations/
+│   ├── static/
+│   │   └── recipes/
+│   │       ├── css/
+│   │       ├── img/
+│   │       └── js/
+│   └── tests/
+│       ├── __init__.py
+│       ├── test_models.py
+│       ├── test_smoke.py
+│       └── test_views.py
+├── templates/
+│   ├── base.html
+│   ├── home.html
+│   ├── search.html
+│   ├── surprise_me.html
+│   ├── profile.html
+│   ├── friends.html
+│   ├── add_recipe.html
+│   ├── recipe_detail.html
+│   ├── recipe_delete.html
+│   └── registration/
+│       ├── login.html
+│       └── signup.html
+└── README.md

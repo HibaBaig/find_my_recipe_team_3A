@@ -1,43 +1,34 @@
-from django.test import TestCase , Client
-from django.urls import reverse
-from recipes.models import Ingredient, Recipe, SavedRecipe, Friendship
+from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from recipes.models import Recipe
-from .test_helpers import make_recipe, make_user
+
+from recipes.models import Ingredient, Recipe, SavedRecipe, Friendship
 
 User = get_user_model()
 
 
 class TestViews(TestCase):
-
     def setUp(self):
         self.user = User.objects.create_user(username="testuser", password="testpassword")
         self.client.login(username="testuser", password="testpassword")
 
-    def new_recipe(self):
-        recipe = Recipe(
-            author=self.user,
-            title="title",
-            description="description",
-            steps="steps",
-        )
+    def new_ingredient(self):
+        ingredient = Ingredient.objects.create(name="name")
+        ingredient.full_clean()
+        return ingredient
+
+    def new_recipe(self, title="title", description="description", steps="steps"):
+        recipe = Recipe(author=self.user, title=title, description=description, steps=steps)
         recipe.full_clean()
         recipe.save()
         recipe.ingredients.add(self.new_ingredient())
         return recipe
 
-    def new_ingredient(self):
-        ingredient = Ingredient(name="name")
-        ingredient.full_clean()
-        ingredient.save()
-        return ingredient
-
     # home
     def test_home_view_template(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "home.html") 
+        self.assertTemplateUsed(response, "home.html")
 
     def test_home_view(self):
         recipe = self.new_recipe()
@@ -47,7 +38,7 @@ class TestViews(TestCase):
     # toggle save
     def test_toggle_save_view_login_required(self):
         self.client.logout()
-        response = self.client.post(f"/recipes/1/toggle-save/")     
+        response = self.client.post("/recipes/1/toggle-save/")
         self.assertEqual(response.status_code, 302)
 
     def test_toggle_save_view_saved(self):
@@ -66,10 +57,10 @@ class TestViews(TestCase):
     # recipe edit
     def test_recipe_edit_view_login_required(self):
         self.client.logout()
-        response = self.client.get("/recipes/1/edit/") 
+        response = self.client.get("/recipes/1/edit/")
         self.assertEqual(response.status_code, 302)
 
-    def test_recipe_edit_view(self):       
+    def test_recipe_edit_view(self):
         recipe = self.new_recipe()
         response = self.client.get(f"/recipes/{recipe.id}/edit/")
         self.assertEqual(response.status_code, 200)
@@ -80,8 +71,7 @@ class TestViews(TestCase):
         recipe = self.new_recipe()
         response = self.client.get(f"/recipes/{recipe.id}/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "recipe_detail.html") 
-
+        self.assertTemplateUsed(response, "recipe_detail.html")
 
     # recipe create
     def test_recipe_create_view_login_required(self):
@@ -92,7 +82,7 @@ class TestViews(TestCase):
     def test_recipe_create_view(self):
         response = self.client.get("/recipes/create/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "add_recipe.html") 
+        self.assertTemplateUsed(response, "add_recipe.html")
 
     # recipe delete
     def test_recipe_delete_view_login_required(self):
@@ -108,7 +98,7 @@ class TestViews(TestCase):
 
     # search
     def test_search_view(self):
-        recipe = self.new_recipe()
+        recipe = self.new_recipe(title="title")
         response = self.client.get("/search/?q=title")
         self.assertEqual(response.status_code, 200)
         self.assertIn(recipe, response.context["recipe_results"])
@@ -126,28 +116,23 @@ class TestViews(TestCase):
         self.client.logout()
         response = self.client.get("/signup/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "registration/signup.html")  
+        self.assertTemplateUsed(response, "registration/signup.html")
 
     def test_signup_view_post(self):
-        username = "testuser_post"
-        email = "testuser_post@example.com"
-        password = "ComplexPass123!"
         data = {
-            "username": username,
-            "email": email,
-            "password1": password,
-            "password2": password,
+            "username": "testuser_post",
+            "email": "testuser_post@example.com",
+            "password1": "ComplexPass123!",
+            "password2": "ComplexPass123!",
         }
         response = self.client.post("/signup/", data)
         self.assertEqual(response.status_code, 302)
 
-
     def test_signup_view_post_password_mismatch(self):
-        response = self.client.post("/signup/", {
-            "username": "username",
-            "password1": "password",
-            "password2": "wrongpassword"
-        })
+        response = self.client.post(
+            "/signup/",
+            {"username": "username", "password1": "password", "password2": "wrongpassword"},
+        )
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username="username").exists())
 
@@ -169,46 +154,18 @@ class TestViews(TestCase):
         response = self.client.post("/friends/add/", {"username": other_user.username})
         self.assertEqual(response.status_code, 302)
         self.assertTrue(
-            Friendship.objects.filter(
-                from_user=self.user,
-                to_user=other_user
-            ).exists()
+            Friendship.objects.filter(from_user=self.user, to_user=other_user).exists()
         )
 
     # accept friend
-    def test_accept_friend_view(self): 
+    def test_accept_friend_view(self):
         other_user = User.objects.create_user(username="otheruser", password="otherpassword")
         friendship = Friendship.objects.create(
             from_user=other_user,
             to_user=self.user,
-            status=Friendship.PENDING
+            status=Friendship.PENDING,
         )
         response = self.client.post(f"/friends/accept/{friendship.id}/")
         self.assertEqual(response.status_code, 302)
-
         friendship.refresh_from_db()
         self.assertEqual(friendship.status, Friendship.ACCEPTED)
-        from django.test import TestCase, Client
-
-
-    def setUp(self):
-        Recipe.objects.create(title="Veggie Chili", description="Beans and veggies")
-        Recipe.objects.create(title="Garlic Chicken Rice", description="Garlicky chicken with rice")
-
-    def test_search_returns_matches(self):
-        client = Client()
-        resp = client.get(reverse("recipes:search"), {"q": "garlic"})  # adjust url name if needed
-        self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, "Garlic Chicken Rice")
-        self.assertNotContains(resp, "Veggie Chili")
-
-    def setUp(self):
-        self.client = Client()
-        make_recipe(title="Veggie Chili")
-        make_recipe(title="Garlic Chicken Rice")
-
-    def test_search_returns_matches(self):
-        resp = self.client.get(reverse("recipes:search"), {"q": "garlic"})
-        self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, "Garlic Chicken Rice")
-        self.assertNotContains(resp, "Veggie Chili")

@@ -1,8 +1,10 @@
-from django.test import TestCase
+from django.test import TestCase , Client
+from django.urls import reverse
 from recipes.models import Ingredient, Recipe, SavedRecipe, Friendship
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from recipes.models import Recipe
+from .test_helpers import make_recipe, make_user
 
 User = get_user_model()
 
@@ -196,6 +198,17 @@ class TestViews(TestCase):
     def test_search_returns_matches(self):
         client = Client()
         resp = client.get(reverse("recipes:search"), {"q": "garlic"})  # adjust url name if needed
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Garlic Chicken Rice")
+        self.assertNotContains(resp, "Veggie Chili")
+
+    def setUp(self):
+        self.client = Client()
+        make_recipe(title="Veggie Chili")
+        make_recipe(title="Garlic Chicken Rice")
+
+    def test_search_returns_matches(self):
+        resp = self.client.get(reverse("recipes:search"), {"q": "garlic"})
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, "Garlic Chicken Rice")
         self.assertNotContains(resp, "Veggie Chili")

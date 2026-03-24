@@ -11,8 +11,7 @@ Discover, search, and share recipes tailored to your dietary preferences. Upload
 - [Run & Build](#run--build)
 - [Static & Media](#static--media)
 - [Testing](#testing)
-- [API (if applicable)](#api-if-applicable)
-- [Deployment](#deployment)
+- [Deployment](#deployment) [on python anywhere]
 - [Troubleshooting](#troubleshooting)
 - [Credits](#credits)
 - [License](#license)
@@ -26,7 +25,7 @@ Discover, search, and share recipes tailored to your dietary preferences. Upload
 - 🎲 “Surprise Me” random pick
 
 ## Tech Stack
-- Backend: Django / Django REST Framework (if API enabled)
+- Backend: Django / Django REST Framework
 - Frontend: Django templates + custom CSS (Bootstrap optional)
 - DB: SQLite (dev) — easily swap to Postgres
 - Assets: Django staticfiles
@@ -102,7 +101,3 @@ python manage.py test recipes
 
 ## Credits
 - Team: Team 3A
-- Logo: provided by project team
-
-## License
-MIT (or your chosen license)

@@ -10,7 +10,6 @@ from django.views.decorators.http import require_POST
 from .forms import CommentForm, ProfileForm, RecipeForm, SignUpForm
 from .models import Friendship, Ingredient, Profile, Recipe, RecipeIngredient, SavedRecipe, Tag
 
-# Keywords used to split dietary tags from general feature tags on the home page.
 DIETARY_KEYWORDS = (
     "vegan",
     "vegetarian",
@@ -182,6 +181,8 @@ def surprise_me(request):
 
 
 def signup(request):
+    if request.user.is_authenticated:
+        return redirect("recipes:home")
     if request.method == "POST":
         form = SignUpForm(request.POST)
         if form.is_valid():
